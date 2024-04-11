@@ -21,7 +21,7 @@ def radiation_law_wavelength(wavelength, temp):
     spectral_radiance = (2 * h * c**2) / (wavelength**5 * (exponent_factor - 1))
     return spectral_radiance
 
-def calculate_peak_wavelength(temp):
+def peak_wavelength(temp):
     """
     Calculates the peak wavelength of black body radiation for a given temperature using Wien's Law.
     
