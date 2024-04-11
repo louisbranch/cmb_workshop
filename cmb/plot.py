@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ipywidgets import interact, FloatSlider, Dropdown
 
-from . import blackbody
+from . import blackbody, const
 
 PROVIDED_COLOR = 'C0'
 STUDENT_COLOR = 'C1'
@@ -29,7 +29,7 @@ def blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn):
     plt.title('Blackbody Radiation Spectrum at {:.0f} K'.format(temp))
     plt.xlabel('Wavelength (nm)')
     plt.ylabel(r'Spectral Radiance ($W/m^2/sr/m$)')
-    plt.legend()
+    plt.legend(loc='upper right')
     plt.grid(True)
 
 def blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn):
@@ -57,11 +57,10 @@ def interactive_blackbody_radiation(wavelengths, student_fn):
     - wavelengths: Array of wavelengths (in meters) to plot.
     - student_fn: Student's implementation of the black body radiation law.
     """
-    reference_objects = [("Sun", 5778), ("Sirius", 9940), ("Red Dwarf", 3200)]
     
     # Create dropdown for reference temperature selection
     ref_dropdown = Dropdown(
-        options=[(name, (name, temp)) for name, temp in reference_objects],
+        options=[(name, (name, temp)) for name, temp in const.reference_objects],
         value=("Sun", 5778),  # Default value
         description='Reference:'
     )
@@ -110,7 +109,12 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
                     textcoords='data',
                     arrowprops=dict(arrowstyle='->', color=STUDENT_COLOR))
 
-    plt.legend()
+    # Define spectral regions with colors
+    plt.axvspan(0, 400, color='violet', alpha=0.2, label='Ultraviolet')
+    plt.axvspan(400, 700, color='yellow', alpha=0.2, label='Visible Light')
+    plt.axvspan(700, 2000, color='red', alpha=0.2, label='Infrared')
+
+    plt.legend(loc='upper right')
     plt.show()
 
 def interactive_peak_wavelength(wavelengths, bb_student_fn, wl_student_fn):
@@ -122,11 +126,10 @@ def interactive_peak_wavelength(wavelengths, bb_student_fn, wl_student_fn):
     - bb_student_fn: Student's implementation of the blackbody radiation.
     - wl_student_fn: Student's implementation of the wien's law.
     """
-    reference_objects = [("Sun", 5778), ("Sirius", 9940), ("Red Dwarf", 3200)]
     
     # Create dropdown for reference temperature selection
     ref_dropdown = Dropdown(
-        options=[(name, (name, temp)) for name, temp in reference_objects],
+        options=[(name, (name, temp)) for name, temp in const.reference_objects],
         value=("Sun", 5778),  # Default value
         description='Reference:'
     )
