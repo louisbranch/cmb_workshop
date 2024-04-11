@@ -2,16 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from ipywidgets import interact, fixed, Dropdown, FloatSlider, IntSlider
 
-from . import blackbody, const
+from . import functions, const
 
 PROVIDED_COLOR = 'C0'
 STUDENT_COLOR = 'C1'
 REFERENCE_COLOR = 'C2'
 
 def blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn):
-    ref_radiance = np.array([blackbody.radiation_law_wavelength(wavelength, ref_temp) for wavelength in wavelengths])
+    ref_radiance = np.array([functions.radiation_law_wavelength(wavelength, ref_temp) for wavelength in wavelengths])
     # Calculate spectral radiance using the provided function
-    provided_radiance = np.array([blackbody.radiation_law_wavelength(wavelength, temp) for wavelength in wavelengths])
+    provided_radiance = np.array([functions.radiation_law_wavelength(wavelength, temp) for wavelength in wavelengths])
     
     # Attempt to calculate spectral radiance using the student's function
     student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
@@ -90,8 +90,8 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
     blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn)
 
     # Calculate and plot the peak wavelength using blackbody.peak_wavelength
-    peak_wavelength = blackbody.peak_wavelength(temp)
-    peak_radiance = blackbody.radiation_law_wavelength(peak_wavelength, temp)
+    peak_wavelength = functions.peak_wavelength(temp)
+    peak_radiance = functions.radiation_law_wavelength(peak_wavelength, temp)
     plt.scatter(peak_wavelength * 1e9, peak_radiance, c=PROVIDED_COLOR, s=100, zorder=5, label='Provided Peak Wavelength')
     plt.annotate(f'Provided Peak at {peak_wavelength * 1e9:.2f} nm',
                  xy=(peak_wavelength * 1e9, peak_radiance),
@@ -154,8 +154,6 @@ def cobe_coefficients_fit(coeffs=None, show_best_fit=False):
     frequencies = data[:, 0]
     intensities = data[:, 1]
 
-    print(blackbody.cobe_best_fit(frequencies, intensities, 5))
-
     plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
     
     # Generate a range of frequency values for plotting the fit curve
@@ -171,7 +169,7 @@ def cobe_coefficients_fit(coeffs=None, show_best_fit=False):
 
     # Optionally plot the best fit curve
     if show_best_fit:
-        best_fit_coeffs = blackbody.cobe_best_fit(frequencies, intensities, 5)
+        best_fit_coeffs = functions.cobe_best_fit(frequencies, intensities, 5)
         best_fit_curve = np.polyval(best_fit_coeffs, freq_range)
         plt.plot(freq_range, best_fit_curve, label='Best Fit', color=REFERENCE_COLOR, linestyle='--')
 
