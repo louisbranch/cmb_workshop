@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ipywidgets import interact, FloatSlider
-import ipywidgets as widgets
+from ipywidgets import interact, FloatSlider, Dropdown
 
 from . import blackbody
 
@@ -33,20 +32,19 @@ def blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn):
     plt.legend()
     plt.grid(True)
 
-def blackbody_radiation(wavelengths, temp, student_fn):
+def blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn):
     """
     Plots the spectral radiance of a black body at given wavelengths and temperature,
     using both a provided reference function and the student's function.
     
     Parameters:
     - wavelengths: Array of wavelengths (in meters) to plot.
+    - ref_name: Name of a reference object.
+    - ref_temp: Temperature of a reference object (in Kelvin).
     - temp: Temperature of the black body (in Kelvin).
     - student_fn: Student's implementation of the black body radiation law.
     """
 
-    ref_name = 'Sun'
-    ref_temp = 5772
-    
     blackbody_plot(wavelengths, ref_name, ref_temp, temp, student_fn)
     
     plt.show()
@@ -59,28 +57,37 @@ def interactive_blackbody_radiation(wavelengths, student_fn):
     - wavelengths: Array of wavelengths (in meters) to plot.
     - student_fn: Student's implementation of the black body radiation law.
     """
-    def update_plot(temp=5778):
-        blackbody_radiation(wavelengths, temp, student_fn)
+    reference_objects = [("Sun", 5778), ("Sirius", 9940), ("Red Dwarf", 3200)]
+    
+    # Create dropdown for reference temperature selection
+    ref_dropdown = Dropdown(
+        options=[(name, (name, temp)) for name, temp in reference_objects],
+        value=("Sun", 5778),  # Default value
+        description='Reference:'
+    )
+
+    def update_plot(temp=5778, ref=ref_dropdown.value):
+        ref_name, ref_temp = ref
+        blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn)
         
     temp_slider = FloatSlider(value=5778, min=1000, max=10000, step=100, description='Temp (K):', readout_format='.0f')
     
-    interact(update_plot, temp=temp_slider)
+    interact(update_plot, temp=temp_slider, ref=ref_dropdown)
 
-def peak_wavelength(wavelengths, temp, bb_student_fn, wl_student_fn):
+def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_student_fn):
     """
     Plots the spectral radiance of a black body at given wavelengths and temperature,
     using both a provided reference function and the student's function, highlighting its peak.
     
     Parameters:
     - wavelengths: Array of wavelengths (in meters) to plot.
+    - ref_name: Name of a reference object.
+    - ref_temp: Temperature of a reference object (in Kelvin).
     - temp: Temperature of the black body (in Kelvin).
     - bb_student_fn: Student's implementation of the blackbody radiation.
     - wl_student_fn: Student's implementation of the wien's law.
     """
     
-    ref_name = 'Sun'
-    ref_temp = 5772
-
     blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn)
 
     # Calculate and plot the peak wavelength using blackbody.peak_wavelength
@@ -89,7 +96,7 @@ def peak_wavelength(wavelengths, temp, bb_student_fn, wl_student_fn):
     plt.scatter(peak_wavelength * 1e9, peak_radiance, c=PROVIDED_COLOR, s=100, zorder=5, label='Provided Peak Wavelength')
     plt.annotate(f'Provided Peak at {peak_wavelength * 1e9:.2f}',
                  xy=(peak_wavelength * 1e9, peak_radiance),
-                 xytext=(peak_wavelength * 1e9 * 1.5, peak_radiance * 0.8),
+                 xytext=(peak_wavelength * 1e9 * 1.5, peak_radiance * 0.7),
                  textcoords='data',
                  arrowprops=dict(arrowstyle='->', color=PROVIDED_COLOR))
 
@@ -99,9 +106,9 @@ def peak_wavelength(wavelengths, temp, bb_student_fn, wl_student_fn):
         plt.scatter(student_peak_wavelength * 1e9, student_peak_radiance, c=STUDENT_COLOR, s=100, marker='*', zorder=6, label='Your Peak Wavelength')
         plt.annotate(f'Your Peak at {student_peak_wavelength * 1e9:.2f}',
                     xy=(student_peak_wavelength * 1e9, peak_radiance),
-                    xytext=(student_peak_wavelength * 1e9 * 1.5, student_peak_radiance * 0.9),
+                    xytext=(student_peak_wavelength * 1e9 * 1.3, student_peak_radiance * 0.9),
                     textcoords='data',
-                    arrowprops=dict(arrowstyle='->', color=PROVIDED_COLOR))
+                    arrowprops=dict(arrowstyle='->', color=STUDENT_COLOR))
 
     plt.legend()
     plt.show()
@@ -115,9 +122,19 @@ def interactive_peak_wavelength(wavelengths, bb_student_fn, wl_student_fn):
     - bb_student_fn: Student's implementation of the blackbody radiation.
     - wl_student_fn: Student's implementation of the wien's law.
     """
-    def update_plot(temp=5778):
-        peak_wavelength(wavelengths, temp, bb_student_fn, wl_student_fn)
+    reference_objects = [("Sun", 5778), ("Sirius", 9940), ("Red Dwarf", 3200)]
+    
+    # Create dropdown for reference temperature selection
+    ref_dropdown = Dropdown(
+        options=[(name, (name, temp)) for name, temp in reference_objects],
+        value=("Sun", 5778),  # Default value
+        description='Reference:'
+    )
+
+    def update_plot(temp=5778, ref=ref_dropdown.value):
+        ref_name, ref_temp = ref
+        peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_student_fn)
         
     temp_slider = FloatSlider(value=5778, min=1000, max=10000, step=100, description='Temp (K):', readout_format='.0f')
     
-    interact(update_plot, temp=temp_slider)
+    interact(update_plot, temp=temp_slider, ref=ref_dropdown)
