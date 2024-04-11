@@ -3,7 +3,7 @@ import numpy as np
 reference_objects = [("Sun", 5778), ("Sirius", 9940), ("Red Dwarf", 3200)]
 
 # COBE/FIRAS CMB monopole spectrum
-# frequency in cm^-1 by monopole spectrum in MJy/sr
+# frequency[cm^-1] by intensity [MJy/sr]
 # source: https://lambda.gsfc.nasa.gov/data/cobe/firas/monopole_spec/firas_monopole_spec_v1.txt
 cmb_cobes = np.array([
     (2.27, 200.723),

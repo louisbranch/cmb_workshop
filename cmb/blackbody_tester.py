@@ -47,7 +47,6 @@ def test_peak_wavelength(student_func):
         ("Hot blue star", (20000, )),             # High temp typical of a hot blue star
     ]
 
-
     def formatter(case, expected, result):
         scenario, (temp, ) = case
         return(f"Scenario {scenario} failed:\nTemperature={temp} K.\n" +

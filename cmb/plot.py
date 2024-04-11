@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ipywidgets import interact, FloatSlider, Dropdown
+from ipywidgets import interact, fixed, Dropdown, FloatSlider, IntSlider
 
 from . import blackbody, const
 
@@ -141,3 +141,90 @@ def interactive_peak_wavelength(wavelengths, bb_student_fn, wl_student_fn):
     temp_slider = FloatSlider(value=5778, min=1000, max=10000, step=100, description='Temp (K):', readout_format='.0f')
     
     interact(update_plot, temp=temp_slider, ref=ref_dropdown)
+
+def cobe_coefficients_fit(coeffs=None, show_best_fit=False):
+    """
+    Plots COBE data points and a forth-degree polynomial fit based on provided coefficients.
+    
+    Parameters:
+    - coeffs: coefficients of the polynomial
+    """
+
+    data = const.cmb_cobes
+    frequencies = data[:, 0]
+    intensities = data[:, 1]
+
+    print(blackbody.cobe_best_fit(frequencies, intensities, 5))
+
+    plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
+    
+    # Generate a range of frequency values for plotting the fit curve
+    freq_range = np.linspace(frequencies.min(), frequencies.max(), 400)
+    
+    # Calculate the values of the polynomial at each point in freq_range
+    if coeffs is not None:
+        a, b, c, d, e = coeffs
+        fit_curve = a*freq_range**4 + b*freq_range**3 + c*freq_range**2 + d*freq_range + e
+    
+        # Plot the polynomial fit curve
+        plt.plot(freq_range, fit_curve, color=STUDENT_COLOR, label='Fit Curve')
+
+    # Optionally plot the best fit curve
+    if show_best_fit:
+        best_fit_coeffs = blackbody.cobe_best_fit(frequencies, intensities, 5)
+        best_fit_curve = np.polyval(best_fit_coeffs, freq_range)
+        plt.plot(freq_range, best_fit_curve, label='Best Fit', color=REFERENCE_COLOR, linestyle='--')
+
+    plt.title('Cosmic microwave background spectrum (from COBE)')
+    plt.xlabel('Frequency (cm^-1)')
+    plt.ylabel('Intensity (MJy/sr)')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def interactive_cobe_polynomial_fit():
+    """
+    Creates interactive controls for fitting polynomial and showing best fit.
+    """
+
+    a = FloatSlider(min=-0.05, max=0, step=0.01, value=-0.05, description='a: x^4')
+    b = FloatSlider(min=2.2, max=2.3, step=0.01, value=2.2, description='b: x^3')
+    c = FloatSlider(min=-43, max=-42, step=0.1, value=-43, description='c: x^2')
+    d = FloatSlider(min=280, max=285, step=0.5, value=280, description='d: x')
+    e = FloatSlider(min=-250, max=-240, step=1, value=-250, description='e')
+    
+    def update_plot(a, b, c, d, e, show_best_fit):
+        cobe_coefficients_fit((a, b, c, d, e), show_best_fit)
+    
+    interact(update_plot, a=a, b=b, c=c, d=d, e=e, show_best_fit=fixed(False))
+
+
+def cobe_degree_fit(degree):
+    """Fit a polynomial of specified degree to the data and plot the results."""
+
+    data = const.cmb_cobes
+    frequencies = data[:, 0]
+    intensities = data[:, 1]
+
+    # Fit polynomial
+    coeffs = np.polyfit(frequencies, intensities, degree)
+    
+    # Generate polynomial curve
+    freq_range = np.linspace(min(frequencies), max(frequencies), 400)
+    fit_curve = np.polyval(coeffs, freq_range)
+    
+    # Plot data
+    plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
+    plt.plot(freq_range, fit_curve, color=STUDENT_COLOR, label=f'{degree}-degree Fit')
+    plt.title(f'Cosmic microwave background spectrum (from COBE)\n{degree}-degree Polynomial Fit')
+    plt.xlabel('Frequency')
+    plt.ylabel('Intensity')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+
+def interactive_polynomial_degree_selector():
+    """Interactive selector for polynomial degree."""
+    slider = IntSlider(min=1, max=5, step=1, value=1, description='Polynomial Degree', 
+                       style={'description_width': '150px'})
+    interact(cobe_degree_fit, degree=slider)

@@ -34,3 +34,19 @@ def peak_wavelength(temp):
     b = 2.897e-3  # Wien's displacement constant in meter-Kelvin
     lambda_max = b / temp
     return lambda_max
+
+def cobe_best_fit(frequencies, intensities, degree=3):
+    """
+    Calculates the best-fit polynomial coefficients for the COBE data.
+    
+    Parameters:
+    - frequencies: Array of frequency data.
+    - intensities: Array of intensity data.
+    - degree: Degree of the polynomial to fit (default is 3 for a cubic polynomial).
+    
+    Returns:
+    - Array of coefficients for the best-fit polynomial.
+    """
+    # Fit a polynomial of specified degree to the data
+    coefficients = np.polyfit(frequencies, intensities, degree)
+    return coefficients
