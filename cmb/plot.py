@@ -94,7 +94,7 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
     peak_wavelength = blackbody.peak_wavelength(temp)
     peak_radiance = blackbody.radiation_law_wavelength(peak_wavelength, temp)
     plt.scatter(peak_wavelength * 1e9, peak_radiance, c=PROVIDED_COLOR, s=100, zorder=5, label='Provided Peak Wavelength')
-    plt.annotate(f'Provided Peak at {peak_wavelength * 1e9:.2f}',
+    plt.annotate(f'Provided Peak at {peak_wavelength * 1e9:.2f} nm',
                  xy=(peak_wavelength * 1e9, peak_radiance),
                  xytext=(peak_wavelength * 1e9 * 1.5, peak_radiance * 0.7),
                  textcoords='data',
@@ -104,7 +104,7 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
     student_peak_radiance = bb_student_fn(student_peak_wavelength, temp)
     if student_peak_wavelength is not None and student_peak_radiance is not None:
         plt.scatter(student_peak_wavelength * 1e9, student_peak_radiance, c=STUDENT_COLOR, s=100, marker='*', zorder=6, label='Your Peak Wavelength')
-        plt.annotate(f'Your Peak at {student_peak_wavelength * 1e9:.2f}',
+        plt.annotate(f'Your Peak at {student_peak_wavelength * 1e9:.2f} nm',
                     xy=(student_peak_wavelength * 1e9, peak_radiance),
                     xytext=(student_peak_wavelength * 1e9 * 1.3, student_peak_radiance * 0.9),
                     textcoords='data',
