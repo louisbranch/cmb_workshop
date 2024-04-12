@@ -70,15 +70,15 @@ class DopplerEffect(Scene):
     def get_sine_wave(self, freq, shift, color):
         # Define the parametric function for the sine wave with horizontal shift and dynamic color
         def parametric_sine_wave(t):
-            k = 0.01 # rate of increase
+            k = 0.1 # rate of increase
 
             # x value will be t plus the horizontal shift, y is the sine of the frequency plus increase
-            return np.array([t + shift, np.sin(np.pi * freq * t + np.pi * k * t**2), 0])
+            return np.array([t+shift, np.sin(np.pi * freq * t + np.pi * k * t**2), 0])
 
         # Create the ParametricFunction using the defined function with dynamic coloring
         return ParametricFunction(
             parametric_sine_wave,
-            t_range=[0, 5, 0.01],
+            t_range=[0, 5-shift, 0.01],
             color=color
         )
 
