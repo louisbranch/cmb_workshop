@@ -71,7 +71,7 @@ def test_blackbody_radiation(student_func):
                                     f"Expected result was close to {expected:.2e} W/m^2/sr/m, but got {result:.2e}.")
 
     return create_test_cases('Blackbody Radiation', test_cases,
-                                    functions.radiation_law_wavelength, student_func, formatter)
+                                    functions.blackbody_radiation, student_func, formatter)
 
 
 def test_peak_wavelength(student_func):
