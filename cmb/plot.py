@@ -142,6 +142,37 @@ def interactive_peak_wavelength(wavelengths, bb_student_fn, wl_student_fn):
     
     interact(update_plot, temp=temp_slider, ref=ref_dropdown)
 
+def visibile_wavelengths():
+    # Defining the visible light spectrum in nm and their corresponding colors
+    wavelengths = [400, 450, 495, 570, 590, 620, 700]
+    colors = ['#8B00FF', '#4B0082', '#00FF00', '#FFFF00', '#FF7F00', '#FF0000']
+    labels = ['Violet', 'Blue', 'Green', 'Yellow', 'Orange', 'Red']
+
+    # Create a figure and a single subplot
+    fig, ax = plt.subplots(figsize=(20, 2))
+
+    # Plot each segment in its respective color
+    for i in range(len(wavelengths) - 1):
+        ax.axvspan(wavelengths[i], wavelengths[i + 1], color=colors[i], alpha=0.5)
+        # Adding annotations approximately in the middle of each color band
+        ax.text((wavelengths[i] + wavelengths[i + 1]) / 2, 1, labels[i], 
+                color='black', horizontalalignment='center', verticalalignment='center')
+
+    # Setting labels and title
+    ax.set_xlabel('Wavelength (nm)')
+    ax.set_ylabel('Intensity (arbitrary units)')
+    ax.set_xticks(wavelengths)
+    ax.set_title('Visible Light Spectrum')
+
+    # Limiting the x-axis to the visible spectrum range
+    ax.set_xlim(400, 700)
+    ax.set_ylim(0, 2)
+
+    # Remove y-axis for cleaner visualization
+    ax.yaxis.set_visible(False)
+
+    plt.show()
+
 def cobe_coefficients_fit(coeffs=None, show_best_fit=False):
     """
     Plots COBE data points and a forth-degree polynomial fit based on provided coefficients.
