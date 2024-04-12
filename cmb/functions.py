@@ -6,7 +6,7 @@ h = 6.62607015e-34  # Planck constant, J·s
 c = 299792458       # Speed of light, m/s
 k = 1.380649e-23    # Boltzmann constant, J/K
 
-def radiation_law_wavelength(wavelength, temp):
+def blackbody_radiation(wavelength, temp):
     """
     Calculates the spectral radiance of a black body at a given wavelength and temperature using Planck's law.
     

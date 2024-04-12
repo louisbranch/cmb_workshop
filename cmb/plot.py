@@ -49,13 +49,13 @@ def blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn):
     
     plt.show()
 
-def interactive_blackbody_radiation(wavelengths, student_fn):
+def interactive_blackbody_radiation(student_fn, wavelengths=const.wavelengths):
     """
     Creates an interactive plot for black body radiation with a slider to adjust the temperature.
     
     Parameters:
-    - wavelengths: Array of wavelengths (in meters) to plot.
     - student_fn: Student's implementation of the black body radiation law.
+    - wavelengths: Array of wavelengths (in meters) to plot.
     """
     
     # Create dropdown for reference temperature selection
@@ -117,14 +117,14 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
     plt.legend(loc='upper right')
     plt.show()
 
-def interactive_peak_wavelength(wavelengths, bb_student_fn, wl_student_fn):
+def interactive_peak_wavelength(bb_student_fn, wl_student_fn, wavelengths=const.wavelengths):
     """
     Creates an interactive plot for black body radiation with a slider to adjust the temperature.
     
     Parameters:
-    - wavelengths: Array of wavelengths (in meters) to plot.
     - bb_student_fn: Student's implementation of the blackbody radiation.
     - wl_student_fn: Student's implementation of the wien's law.
+    - wavelengths: Array of wavelengths (in meters) to plot.
     """
     
     # Create dropdown for reference temperature selection

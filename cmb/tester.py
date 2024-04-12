@@ -48,7 +48,7 @@ def create_test_cases(name: str, test_cases: List,
     else:
         return "\n\n".join(messages)
 
-def test_blackbody_radiation_law(student_func):
+def test_blackbody_radiation(student_func):
     """
     Tests the student's implementation of the black body radiation law function.
     
