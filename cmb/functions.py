@@ -1,6 +1,5 @@
 import numpy as np
 
-# TODO: load constants from astropy
 # Constants in SI units
 h = 6.62607015e-34  # Planck constant, J·s
 c = 299792458       # Speed of light, m/s
