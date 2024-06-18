@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ipywidgets import interact, fixed, Dropdown, FloatSlider, IntSlider
+from ipywidgets import interact, Dropdown, FloatSlider, Label, VBox, HBox, Output
+from IPython.display import display, Math
 
 from . import functions, const
 
@@ -173,7 +174,7 @@ def visibile_wavelengths():
 
     plt.show()
 
-def cobe_curve_fit(temp, bb_student_fn, wl_student_fn):
+def cobe_curve_fit(temp, bb_student_fn):
 
     data = const.cmb_cobes
     frequencies = data[:, 0]
@@ -199,19 +200,89 @@ def cobe_curve_fit(temp, bb_student_fn, wl_student_fn):
     plt.grid(True)
     plt.show()
 
-def interactive_cobe_fit(bb_student_fn, wl_student_fn):
+def interactive_cobe_fit(bb_student_fn):
     """
-    Creates an interactive plot for black body radiation with a slider to adjust the temperature.
+    Creates an interactive plot for black body radiation with a slider to fit for the temperature.
     
     Parameters:
     - bb_student_fn: Student's implementation of the blackbody radiation.
-    - wl_student_fn: Student's implementation of the wien's law.
-    - wavelengths: Array of wavelengths (in meters) to plot.
     """
     
     def update_plot(temp):
-        cobe_curve_fit(temp, bb_student_fn, wl_student_fn)
+        cobe_curve_fit(temp, bb_student_fn)
         
     temp_slider = FloatSlider(value=5, min=1, max=10, step=0.1, description='Temp (K):', readout_format='.1f')
     
     interact(update_plot, temp=temp_slider)
+
+def redshift_visualization(velocity, output):
+    with output:
+        output.clear_output(wait=True)
+
+        # Constants
+        c = 3e8  # Speed of light in m/s
+        initial_wavelength = 500  # Initial wavelength in nm (green light)
+        
+        # Calculate the shifted wavelength
+        shifted_wavelength = initial_wavelength * np.sqrt((1 + velocity/c) / (1 - velocity/c))
+        
+        # Plotting the initial and shifted spectrum
+        fig, ax = plt.subplots()
+        
+        # Initial spectrum
+        x_initial = np.linspace(400, 700, 1000)
+        y_initial = np.exp(-0.5 * ((x_initial - initial_wavelength) / 10)**2)
+        ax.plot(x_initial, y_initial, label='Initial Spectrum', color='green')
+        
+        # Shifted spectrum
+        y_shifted = np.exp(-0.5 * ((x_initial - shifted_wavelength) / 10)**2)
+        ax.plot(x_initial, y_shifted, label='Shifted Spectrum', color='red' if velocity > 0 else 'blue')
+        
+        # Adding labels and legend
+        ax.set_xlabel('Wavelength (nm)')
+        ax.set_ylabel('Intensity')
+        ax.legend()
+
+        # Format the velocity as powers of ten
+        if velocity == 0:
+            velocity_power_ten = "0"
+        else:
+            exponent = int(np.log10(abs(velocity)))
+            base = velocity / 10**exponent
+            velocity_power_ten = "{:.2f} x $10^{}$".format(base, exponent)
+        ax.set_title(fr'Galaxy Moving {"Away" if velocity > 0 else "Towards"} (Velocity = {velocity_power_ten} m/s)')
+
+        plt.show()
+
+def interactive_redshift():
+    output = Output()
+
+    slider = FloatSlider(value=0, min=-8e7, max=1e8, step=1e6, description='Velocity (m/s)', readout=False)
+    velocity_label = Label()
+
+    def update_label(change):
+        velocity = change['new']
+        if velocity == 0:
+            velocity_power_ten = "0"
+        else:
+            exponent = int(np.log10(abs(velocity)))
+            base = velocity / 10**exponent
+            velocity_power_ten = "{:.2f} x 10^{}".format(base, exponent)
+        velocity_label.value = f"{velocity_power_ten} m/s"
+
+    def update_plot(change):
+        redshift_visualization(change['new'], output)
+
+    slider.observe(update_label, names='value')
+
+    update_label({'new': slider.value})
+
+    output = Output()
+
+    ui = VBox([HBox([slider, velocity_label]), output])
+
+    slider.observe(update_plot, names='value')
+
+    display(ui)
+
+    redshift_visualization(slider.value, output)
