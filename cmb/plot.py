@@ -200,7 +200,7 @@ def planck_map(fits='COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'):
 
     return map
 
-def cmb_data(data, show_sigma=False):
+def cmb_std_dev(data, show_guidelines=False):
     
     mean = np.mean(data)
     std = np.std(data)
@@ -211,7 +211,7 @@ def cmb_data(data, show_sigma=False):
     
     plt.axvline(mean, color='blue', linestyle='--', label=f'Mean')
     
-    if show_sigma:
+    if show_guidelines:
         plt.axvline(mean + std, color='green', linestyle=':', label='1σ')
         plt.axvline(mean - std, color='green', linestyle=':')
         plt.axvline(mean + 2 * std, color='orange', linestyle=':', label='2σ')
@@ -225,9 +225,10 @@ def cmb_data(data, show_sigma=False):
     plt.legend()
     plt.grid(False)
 
-    #FIXME: calculate min and max properly
-    xticks = np.linspace(-0.0004, 0.0004, num=10)
-    plt.xticks(ticks=xticks)
+    # Set the x-ticks with the central tick at 0 and others around it
+    max_tick = max(abs(data.min()), data.max())
+    ticks = np.arange(-max_tick, max_tick, std)
+    plt.xticks(ticks)
     plt.gca().set_xticklabels([f'{x:.5f}' for x in plt.gca().get_xticks()], rotation=45)
 
     plt.show()

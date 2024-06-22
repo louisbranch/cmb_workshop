@@ -140,6 +140,22 @@ def cobe_fit(bb_student_fn):
     update_plot()
     display(output)
 
+def cmb_std_dev(data):
+
+    guidelines = widgets.Checkbox(
+        value=False,
+        description='Show Guidelines',
+        disabled=False,
+        tooltip='Show guidelines for the standard deviation.',
+        indent=False
+    )
+
+    def update_plot(guidelines):
+        plot.cmb_std_dev(data, guidelines)
+
+    interact(update_plot, guidelines=guidelines)
+
+
 def reference_dropdown():
     return widgets.Dropdown(
         options=[(name, (name, temp)) for name, temp in const.reference_objects],
