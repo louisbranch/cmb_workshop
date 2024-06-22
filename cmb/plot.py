@@ -125,43 +125,35 @@ def visibile_wavelengths():
 
     plt.show()
 
-def cobe_curve_fit(temp, bb_student_fn):
+def cobe_curve_fit(temp, bb_student_fn, output):
 
-    data = const.cmb_cobes
-    frequencies = data[:, 0]
-    intensities = data[:, 1]
-    wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
-    wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
+    with output:
+        output.clear_output(wait=True)
 
-    plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
+        data = const.cmb_cobes
+        frequencies = data[:, 0]
+        intensities = data[:, 1]
+        wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
+        wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
 
-    provided_radiance = np.array([functions.blackbody_radiation(wavelength, temp) for wavelength in wavelengths])
-    student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
-    
-    if np.any(student_radiance != None):
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
-    else:
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
+        plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
 
-    provided_radiance = np.array([functions.blackbody_radiation(wavelength, temp) for wavelength in wavelengths])
-    student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
-    
-    if np.any(student_radiance != None):
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
-    else:
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
+        provided_radiance = np.array([functions.blackbody_radiation(wavelength, temp) for wavelength in wavelengths])
+        student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
+        
+        if np.any(student_radiance != None):
+            intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
+            plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
+        else:
+            intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
+            plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
 
-    plt.title(f'Cosmic microwave background spectrum (from COBE)')
-    plt.title(f'Cosmic microwave background spectrum (from COBE)')
-    plt.xlabel(r'Frequency ($cm^{-1}$)')
-    plt.ylabel('Intensity (MJy/sr)')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+        plt.title(f'Cosmic microwave background spectrum (from COBE)')
+        plt.xlabel(r'Frequency ($cm^{-1}$)')
+        plt.ylabel('Intensity (MJy/sr)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 def redshift_visualization(velocity, output):
     with output:
