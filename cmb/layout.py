@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from astropy.visualization import astropy_mpl_style
 
-def set_global_config(large=False):
+def set_custom_layout(large: bool=False) -> None:
     plt.style.use(astropy_mpl_style)
 
     # Global settings for plots

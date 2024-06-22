@@ -14,28 +14,15 @@ def peak_wavelength(bb_student_fn, wl_student_fn, wavelengths=const.wavelengths)
     - wavelengths: Array of wavelengths (in meters) to plot.
     """
     
-    ref_dropdown = Dropdown(
-        options=[(name, (name, temp)) for name, temp in const.reference_objects],
-        value=("Sun", 5778),  # Default value
-        description='Reference:',
-        tooltip='Reference object to compare with.'
-    )
-
-    def update_plot(temp=5778, ref=ref_dropdown.value):
+    def update(temp, ref):
         ref_name, ref_temp = ref
         plot.peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_student_fn)
-        
-    temp_slider = FloatSlider(
-        value=5778,
-        min=1000,
-        max=10000,
-        step=100,
-        description='Temp (K):',
-        readout_format='.0f',
-        tooltip='Temperature of the black body.'
-    )
+
+    temperature = temperature_slider()
+    reference = reference_dropdown()
+    set_widget_styles([temperature, reference])
     
-    interact(update_plot, temp=temp_slider, ref=ref_dropdown)
+    interact(update, temp=temperature, ref=reference)
 
 def blackbody_radiation(student_fn, wavelengths=const.wavelengths):
     """
@@ -46,29 +33,15 @@ def blackbody_radiation(student_fn, wavelengths=const.wavelengths):
     - wavelengths: Array of wavelengths (in meters) to plot.
     """
     
-    # Create dropdown for reference temperature selection
-    ref_dropdown = Dropdown(
-        options=[(name, (name, temp)) for name, temp in const.reference_objects],
-        value=("Sun", 5778),  # Default value
-        description='Reference:',
-        tooltip='Reference object to compare with.'
-    )
-
-    temp_slider = FloatSlider(
-        value=5778,
-        min=1000,
-        max=10000,
-        step=100,
-        description='Temp (K):',
-        readout_format='.0f',
-        tooltip='Temperature of the black body.'
-    )
-
-    def update_plot(temp=5778, ref=ref_dropdown.value):
+    def update(temp, ref):
         ref_name, ref_temp = ref
         plot.blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn)
         
-    interact(update_plot, temp=temp_slider, ref=ref_dropdown)
+    temperature = temperature_slider()
+    reference = reference_dropdown()
+    set_widget_styles([temperature, reference])
+    
+    interact(update, temp=temperature, ref=reference)
 
 def redshift():
     output = Output()
@@ -78,9 +51,9 @@ def redshift():
         min=-8e7,
         max=1e8,
         step=1e6,
-        description='Velocity (m/s)',
+        description='Velocity (m/s):',
         readout=False,
-        tootltip='Velocity of the galaxy'
+        tootltip='Velocity of the galaxy.'
     )
 
     velocity_label = Label()
@@ -107,6 +80,7 @@ def redshift():
     ui = VBox([HBox([slider, velocity_label]), output])
 
     slider.observe(update_plot, names='value')
+    set_widget_styles([slider, velocity_label])
 
     display(ui)
 
@@ -134,3 +108,27 @@ def cobe_fit(bb_student_fn):
     )
     
     interact(update_plot, temp=temp_slider)
+
+def reference_dropdown():
+    return Dropdown(
+        options=[(name, (name, temp)) for name, temp in const.reference_objects],
+        value=("Sun", 5778),  # Default value
+        description='Reference Object:',
+        tooltip='Reference object to compare with.'
+    )
+
+def temperature_slider(value=5778):
+    return FloatSlider(
+        value=value,
+        min=1000,
+        max=10000,
+        step=100,
+        description='Temperature (K):',
+        readout_format='.0f',
+        tooltip='Temperature of the black body.'
+    )
+
+def set_widget_styles(list, description_width='initial'):
+    for widget in list:
+        widget.style.description_width = description_width
+        widget.layout.width = '50%'
