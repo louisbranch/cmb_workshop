@@ -93,7 +93,7 @@ def cobe_fit(bb_student_fn):
         'Dry Ice': (190, 210),
         'Liquid Nitrogen': (90, 110),
         'Cryogenic Freezer': (5, 15),
-        'Superconductor Experiment': (0, 5)
+        'Superconductor Exp.': (0, 5)
     }
 
     reference_selector = widgets.SelectionSlider(

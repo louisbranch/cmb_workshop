@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from ipywidgets import interact, Dropdown, FloatSlider, Label, VBox, HBox, Output
 from IPython.display import display, Math
 
-from . import functions, const
+from . import functions, const, cmb_utils
 
 PROVIDED_COLOR = 'C0'
 STUDENT_COLOR = 'C1'
@@ -18,14 +18,14 @@ def blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn):
     student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
 
     # Plot provided function results
-    plt.plot(wavelengths * 1e9, provided_radiance, label='Provided Function', c=PROVIDED_COLOR)
+    plt.plot(wavelengths * 1e9, provided_radiance, label='Provided Blackbody Function', c=PROVIDED_COLOR)
     
     # Plot reference results
     plt.plot(wavelengths * 1e9, ref_radiance, label=f"{ref_name}'s Blackbody", linestyle='--', c=REFERENCE_COLOR)
 
     # Check if the student function returns valid results and plot if so
     if np.any(student_radiance != None):
-        plt.plot(wavelengths * 1e9, student_radiance, label='Your Function', c=STUDENT_COLOR)
+        plt.plot(wavelengths * 1e9, student_radiance, label='Your Blackbody Function', c=STUDENT_COLOR)
 
     plt.title('Blackbody Radiation Spectrum at {:.0f} K'.format(temp))
     plt.xlabel('Wavelength (nm)')
@@ -143,10 +143,10 @@ def cobe_curve_fit(temp, bb_student_fn, output):
         
         if np.any(student_radiance != None):
             intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
-            plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
+            plt.plot(frequencies, intensity_mjy_sr, label='Your Blackbody Function', c=STUDENT_COLOR)
         else:
             intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
-            plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
+            plt.plot(frequencies, intensity_mjy_sr, label='Provided Blackbody Function', c=PROVIDED_COLOR)
 
         plt.title(f'Cosmic microwave background spectrum (from COBE)')
         plt.xlabel(r'Frequency ($cm^{-1}$)')
@@ -193,3 +193,41 @@ def redshift_visualization(velocity, output):
         ax.set_title(fr'Galaxy Moving {"Away" if velocity > 0 else "Towards"} (Velocity = {velocity_power_ten} m/s)')
 
         plt.show()
+
+def planck_map(fits='COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'):
+    map = cmb_utils.load_cmb_map(f'data/{fits}')
+    cmb_utils.view_map(map)
+
+    return map
+
+def cmb_data(data, show_sigma=False):
+    
+    mean = np.mean(data)
+    std = np.std(data)
+    
+    flattened_data = data.flatten()
+    
+    plt.hist(flattened_data, bins=100, alpha=0.7)
+    
+    plt.axvline(mean, color='blue', linestyle='--', label=f'Mean')
+    
+    if show_sigma:
+        plt.axvline(mean + std, color='green', linestyle=':', label='1σ')
+        plt.axvline(mean - std, color='green', linestyle=':')
+        plt.axvline(mean + 2 * std, color='orange', linestyle=':', label='2σ')
+        plt.axvline(mean - 2 * std, color='orange', linestyle=':')
+        plt.axvline(mean + 3 * std, color='purple', linestyle=':', label='3σ')
+        plt.axvline(mean - 3 * std, color='purple', linestyle=':')
+
+    plt.xlabel('Temperature Fluctuations (K)')
+    plt.ylabel('Count')
+    plt.title('Temperature Fluctuations in CMB Data')
+    plt.legend()
+    plt.grid(False)
+
+    #FIXME: calculate min and max properly
+    xticks = np.linspace(-0.0004, 0.0004, num=10)
+    plt.xticks(ticks=xticks)
+    plt.gca().set_xticklabels([f'{x:.5f}' for x in plt.gca().get_xticks()], rotation=45)
+
+    plt.show()
