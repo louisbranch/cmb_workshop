@@ -93,7 +93,7 @@ def cobe_fit(bb_student_fn):
         'Dry Ice': (190, 210),
         'Liquid Nitrogen': (90, 110),
         'Cryogenic Freezer': (5, 15),
-        'Superconductor Experiment': (0, 5)
+        'Superconductor Exp.': (0, 5)
     }
 
     reference_selector = widgets.SelectionSlider(
@@ -139,6 +139,22 @@ def cobe_fit(bb_student_fn):
 
     update_plot()
     display(output)
+
+def cmb_std_dev(data):
+
+    guidelines = widgets.Checkbox(
+        value=False,
+        description='Show Guidelines',
+        disabled=False,
+        tooltip='Show guidelines for the standard deviation.',
+        indent=False
+    )
+
+    def update_plot(guidelines):
+        plot.cmb_std_dev(data, guidelines)
+
+    interact(update_plot, guidelines=guidelines)
+
 
 def reference_dropdown():
     return widgets.Dropdown(
