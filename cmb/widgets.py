@@ -88,28 +88,26 @@ def redshift():
 
 def cobe_fit(bb_student_fn):
 
-    # TODO: review exampels
-    magnitudes = {
-        'Welding Arc': (1e4, 5e4),
-        'Lava': (1e3, 5e3),
-        'Liquid Nitrogen': (1e2, 5e2),
-        'Cryogenic Freezer': (1e1, 5e1),
-        'Superconductor': (1, 5)
+    temperature_references = {
+        'Human Body': (290, 310),
+        'Dry Ice': (190, 210),
+        'Liquid Nitrogen': (90, 110),
+        'Cryogenic Freezer': (5, 15),
+        'Superconductor Experiment': (0, 5)
     }
 
-    magnitude_selector = widgets.SelectionSlider(
-        options=list(magnitudes.keys()),
-        value='Liquid Nitrogen',
-        description='As hot as:',
-        continuous_update=False,
-        tooltip='Magnitude of the temperature range.'
+    reference_selector = widgets.SelectionSlider(
+        options=list(temperature_references.keys()),
+        value='Human Body',
+        description='As hot/cold as:',
+        continuous_update=False
     )
 
     temperature_slider = widgets.FloatSlider(
-        value=(1e2 + 5e2) / 2,
-        min=1e2,
-        max=5e2,
-        step=(5e2 - 1e2) / 100,
+        value=(290 + 310) / 2,
+        min=290,
+        max=310,
+        step=(310 - 290) / 100,
         description='Temperature (K):',
         continuous_update=False,
         tooltip='Temperature of the CMB'
@@ -117,8 +115,8 @@ def cobe_fit(bb_student_fn):
 
     # Update the temperature slider range based on the selected magnitude
     def update_temperature_slider(*args):
-        magnitude = magnitude_selector.value
-        min_temp, max_temp = magnitudes[magnitude]
+        reference = reference_selector.value
+        min_temp, max_temp = temperature_references[reference]
 
         with temperature_slider.hold_sync(), temperature_slider.hold_trait_notifications():
             temperature_slider.min = min_temp
@@ -126,10 +124,10 @@ def cobe_fit(bb_student_fn):
             temperature_slider.value = (min_temp + max_temp) / 2
             temperature_slider.step = (max_temp - min_temp) / 100
 
-    magnitude_selector.observe(update_temperature_slider, names='value')
+    reference_selector.observe(update_temperature_slider, names='value')
 
-    set_widget_styles([magnitude_selector, temperature_slider])
-    display(magnitude_selector, temperature_slider)
+    set_widget_styles([reference_selector, temperature_slider])
+    display(reference_selector, temperature_slider)
 
     output = widgets.Output()
 
