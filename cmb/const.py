@@ -2,7 +2,7 @@ import numpy as np
 
 wavelengths = np.linspace(100e-9, 2000e-9, 100) # 100 points from 100 nm to 2000 nm
 
-reference_objects = [("Sun", 5778), ("Sirius", 9940), ("Red Dwarf", 3200)]
+reference_objects = [("Sun", 5778), ("Sirius A", 9940), ("Red Dwarf", 3200)]
 
 # COBE/FIRAS CMB monopole spectrum
 # frequency[cm^-1] by intensity [MJy/sr]

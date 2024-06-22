@@ -50,30 +50,6 @@ def blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn):
     
     plt.show()
 
-def interactive_blackbody_radiation(student_fn, wavelengths=const.wavelengths):
-    """
-    Creates an interactive plot for black body radiation with a slider to adjust the temperature.
-    
-    Parameters:
-    - student_fn: Student's implementation of the black body radiation law.
-    - wavelengths: Array of wavelengths (in meters) to plot.
-    """
-    
-    # Create dropdown for reference temperature selection
-    ref_dropdown = Dropdown(
-        options=[(name, (name, temp)) for name, temp in const.reference_objects],
-        value=("Sun", 5778),  # Default value
-        description='Reference:'
-    )
-
-    def update_plot(temp=5778, ref=ref_dropdown.value):
-        ref_name, ref_temp = ref
-        blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn)
-        
-    temp_slider = FloatSlider(value=5778, min=1000, max=10000, step=100, description='Temp (K):', readout_format='.0f')
-    
-    interact(update_plot, temp=temp_slider, ref=ref_dropdown)
-
 def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_student_fn):
     """
     Plots the spectral radiance of a black body at given wavelengths and temperature,
@@ -118,31 +94,6 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
     plt.legend(loc='upper right')
     plt.show()
 
-def interactive_peak_wavelength(bb_student_fn, wl_student_fn, wavelengths=const.wavelengths):
-    """
-    Creates an interactive plot for black body radiation with a slider to adjust the temperature.
-    
-    Parameters:
-    - bb_student_fn: Student's implementation of the blackbody radiation.
-    - wl_student_fn: Student's implementation of the wien's law.
-    - wavelengths: Array of wavelengths (in meters) to plot.
-    """
-    
-    # Create dropdown for reference temperature selection
-    ref_dropdown = Dropdown(
-        options=[(name, (name, temp)) for name, temp in const.reference_objects],
-        value=("Sun", 5778),  # Default value
-        description='Reference:'
-    )
-
-    def update_plot(temp=5778, ref=ref_dropdown.value):
-        ref_name, ref_temp = ref
-        peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_student_fn)
-        
-    temp_slider = FloatSlider(value=5778, min=1000, max=10000, step=100, description='Temp (K):', readout_format='.0f')
-    
-    interact(update_plot, temp=temp_slider, ref=ref_dropdown)
-
 def visibile_wavelengths():
     # Defining the visible light spectrum in nm and their corresponding colors
     wavelengths = [400, 450, 495, 570, 590, 620, 700]
@@ -174,58 +125,35 @@ def visibile_wavelengths():
 
     plt.show()
 
-def cobe_curve_fit(temp, bb_student_fn):
+def cobe_curve_fit(temp, bb_student_fn, output):
 
-    data = const.cmb_cobes
-    frequencies = data[:, 0]
-    intensities = data[:, 1]
-    wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
-    wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
+    with output:
+        output.clear_output(wait=True)
 
-    plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
+        data = const.cmb_cobes
+        frequencies = data[:, 0]
+        intensities = data[:, 1]
+        wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
+        wavelengths = np.array([functions.convert_to_freq_cm(freq) for freq in frequencies])
 
-    provided_radiance = np.array([functions.blackbody_radiation(wavelength, temp) for wavelength in wavelengths])
-    student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
-    
-    if np.any(student_radiance != None):
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
-    else:
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
+        plt.scatter(frequencies, intensities, color=PROVIDED_COLOR, label='COBE Data')
 
-    provided_radiance = np.array([functions.blackbody_radiation(wavelength, temp) for wavelength in wavelengths])
-    student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
-    
-    if np.any(student_radiance != None):
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
-    else:
-        intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
-        plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
-
-    plt.title(f'Cosmic microwave background spectrum (from COBE)')
-    plt.title(f'Cosmic microwave background spectrum (from COBE)')
-    plt.xlabel(r'Frequency ($cm^{-1}$)')
-    plt.ylabel('Intensity (MJy/sr)')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-
-def interactive_cobe_fit(bb_student_fn):
-    """
-    Creates an interactive plot for black body radiation with a slider to fit for the temperature.
-    
-    Parameters:
-    - bb_student_fn: Student's implementation of the blackbody radiation.
-    """
-    
-    def update_plot(temp):
-        cobe_curve_fit(temp, bb_student_fn)
+        provided_radiance = np.array([functions.blackbody_radiation(wavelength, temp) for wavelength in wavelengths])
+        student_radiance = np.array([bb_student_fn(wavelength, temp) for wavelength in wavelengths])
         
-    temp_slider = FloatSlider(value=5, min=1, max=10, step=0.1, description='Temp (K):', readout_format='.1f')
-    
-    interact(update_plot, temp=temp_slider)
+        if np.any(student_radiance != None):
+            intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(student_radiance, wavelengths)])
+            plt.plot(frequencies, intensity_mjy_sr, label='Your Function', c=STUDENT_COLOR)
+        else:
+            intensity_mjy_sr = np.array([functions.convert_to_mjy_sr(sr, wl) for sr, wl in zip(provided_radiance, wavelengths)])
+            plt.plot(frequencies, intensity_mjy_sr, label='Provided Function', c=PROVIDED_COLOR)
+
+        plt.title(f'Cosmic microwave background spectrum (from COBE)')
+        plt.xlabel(r'Frequency ($cm^{-1}$)')
+        plt.ylabel('Intensity (MJy/sr)')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 def redshift_visualization(velocity, output):
     with output:
@@ -265,36 +193,3 @@ def redshift_visualization(velocity, output):
         ax.set_title(fr'Galaxy Moving {"Away" if velocity > 0 else "Towards"} (Velocity = {velocity_power_ten} m/s)')
 
         plt.show()
-
-def interactive_redshift():
-    output = Output()
-
-    slider = FloatSlider(value=0, min=-8e7, max=1e8, step=1e6, description='Velocity (m/s)', readout=False)
-    velocity_label = Label()
-
-    def update_label(change):
-        velocity = change['new']
-        if velocity == 0:
-            velocity_power_ten = "0"
-        else:
-            exponent = int(np.log10(abs(velocity)))
-            base = velocity / 10**exponent
-            velocity_power_ten = "{:.2f} x 10^{}".format(base, exponent)
-        velocity_label.value = f"{velocity_power_ten} m/s"
-
-    def update_plot(change):
-        redshift_visualization(change['new'], output)
-
-    slider.observe(update_label, names='value')
-
-    update_label({'new': slider.value})
-
-    output = Output()
-
-    ui = VBox([HBox([slider, velocity_label]), output])
-
-    slider.observe(update_plot, names='value')
-
-    display(ui)
-
-    redshift_visualization(slider.value, output)
