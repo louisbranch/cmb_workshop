@@ -232,14 +232,56 @@ def cmb_map_objects(num_cols=3):
         else:
             result_label.value = f"You got {correct_count} out of {num_images} correct."
 
-    centered = widgets.Layout(margin='20px 0 0 0', display='flex', justify_content='center')
-
     check_button = widgets.Button(description='Check Answers')
     check_button.on_click(check_answers)
-    check_button.layout = centered
-    result_label.layout = centered
+    center([result_label, check_button])
 
-    display(widgets.VBox(rows + [widgets.Box([check_button], layout=centered), result_label]))
+    display(widgets.VBox(rows + [widgets.Box([check_button], layout=centered()), result_label]))
+
+def calculate_moon_distance():
+    expected_distance_m = (const.moon_r * 2) / const.moon_angular_size
+    expected_time_for_light_s = expected_distance_m / const.c
+
+    distance_input = widgets.FloatText(description='Distance (km):')
+    time_input = widgets.FloatText(description='Time (s):')
+    check_button = widgets.Button(description='Check Answers')
+    result_output = widgets.Label()
+
+    set_widget_styles([distance_input, time_input])
+
+    # Function to check and display the results
+    def check_answers(b):
+        user_distance = distance_input.value
+        user_time = time_input.value
+        
+        distance_tolerance = 1e3
+        time_tolerance = 0.05
+        
+        distance_delta = abs(user_distance - expected_distance_m/1e3)
+        time_delta = abs(user_time - expected_time_for_light_s)
+
+        messages = []
+
+        if distance_delta < distance_tolerance and time_delta < time_tolerance:
+            messages.append("Correct! Your calculations are within the expected range.")
+        elif distance_delta < distance_tolerance and time_delta >= time_tolerance:
+            messages.append("Your distance is calculation correct!")
+            messages.append("Check your time calculation. Rembember to convert units where necessary (speed of light is given in m/s).")
+        else:
+            messages.append("Check your calculations.")
+            messages.append("Remember to convert units where necessary (angular diameter needs to be in radians).")
+
+        result_output.value = '\n'.join(messages)
+
+    check_button.on_click(check_answers)
+    center([check_button, result_output])
+
+    # Display the interactive widgets
+    display(widgets.VBox([
+        widgets.HBox([distance_input, time_input]),
+        widgets.Box([check_button], layout=centered()),
+        result_output
+    ]))
 
 def set_widget_styles(list, description_width='initial'):
     for widget in list:
@@ -250,3 +292,10 @@ def set_widget_styles(list, description_width='initial'):
         else:
             widget.style.description_width = description_width
             widget.layout.width = '45%'
+
+def centered():
+    return widgets.Layout(margin='20px 0 0 0', display='flex', justify_content='center')
+
+def center(list):
+    for widget in list:
+        widget.layout = centered()

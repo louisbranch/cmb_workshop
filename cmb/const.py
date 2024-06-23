@@ -1,5 +1,12 @@
 import numpy as np
 
+# Constants in SI units
+h = 6.62607015e-34  # Planck constant, J·s
+c = 299792458       # Speed of light, m/s
+k = 1.380649e-23    # Boltzmann constant, J/K
+moon_r = 1737.1e3   # Radius of the Moon, m
+moon_angular_size = 0.00908 # Angular size of the Moon, rad
+
 wavelengths = np.linspace(100e-9, 2000e-9, 100) # 100 points from 100 nm to 2000 nm
 
 reference_objects = [("Sun", 5778), ("Sirius A", 9940), ("Red Dwarf", 3200)]
