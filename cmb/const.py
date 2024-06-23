@@ -59,3 +59,12 @@ cmb_cobes = np.array([
     (20.87, 5.801),
     (21.33, 4.523)
 ])
+
+cmb_map_url = 'https://phy-act1.princeton.edu/public/snaess/actpol/dr5/atlas/'
+
+cmb_thumbnails_coords = [
+    [-46.266, -25.65],
+    [-40.525, -21.99],
+]
+
+#TODO: add more coordinates for demoinstration purposes

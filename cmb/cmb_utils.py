@@ -5,6 +5,7 @@ from pixell import enmap, enplot
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from ipywidgets import Output
 
 from pixell import reproject, colorize, coordinates
 
@@ -18,8 +19,8 @@ def load_cmb_map(filename):
     imap = enmap.read_map(filename)
     return imap[0]
 
-def view_map(imap):
-    fig = plt.figure(figsize=(40,10))
+def view_map(imap, size=(40, 10)):
+    fig = plt.figure(figsize=size)
     ax = fig.add_subplot(111, projection=imap.wcs)
     ax.imshow(imap, origin="lower", cmap="planck")
     ax.axis("off")
@@ -49,14 +50,19 @@ def extract_thumbnails(imap, coords):
     thumbnails = reproject.thumbnails(imap, coords, r=np.deg2rad(1), apod=0)
     return thumbnails
 
-def plot_thumbnails(thumbnails, ncol=5, figsize=(10,10)):
-    fig = plt.figure(figsize=figsize)
-    nrow = int(np.ceil(len(thumbnails)/ncol))
-    for i, thumb in enumerate(thumbnails):
-        ax = fig.add_subplot(nrow, ncol, i+1, projection=thumb.wcs)
-        ax.imshow(thumb, cmap="planck")
-        ax.axis('off')
-    plt.tight_layout()
+def plot_thumbnails(thumbnails, ncol=5, figsize=(10,10), output=Output()):
+    with output:
+        output.clear_output(wait=True)
+
+        fig = plt.figure(figsize=figsize)
+        nrow = int(np.ceil(len(thumbnails)/ncol))
+        for i, thumb in enumerate(thumbnails):
+            ax = fig.add_subplot(nrow, ncol, i+1, projection=thumb.wcs)
+            ax.imshow(thumb, cmap="planck")
+            ax.axis('off')
+            ax.set_title("Thumbnail {}".format(i+1), fontsize=10)
+        plt.tight_layout()
+        plt.show()
 
 def extract_profile(mean_img):
     r = np.rad2deg(mean_img.modrmap())
