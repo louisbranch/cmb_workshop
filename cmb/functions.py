@@ -1,6 +1,6 @@
 import numpy as np
 
-from const import h, c, k
+from .const import h, c, k
 
 def blackbody_radiation(wavelength, temp):
     """

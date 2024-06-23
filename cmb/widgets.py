@@ -4,9 +4,12 @@ from io import BytesIO
 
 import numpy as np
 from ipywidgets import interact, Output, Label, VBox, HBox, widgets
-from IPython.display import display
+from IPython.display import display, IFrame
 
-from . import plot, const
+from . import plot, const, cmb_utils
+
+ # Store the coordinates for the thumbnails across the notebook
+cmb_coords = const.cmb_thumbnails_coords
 
 def peak_wavelength(bb_student_fn, wl_student_fn, wavelengths=const.wavelengths):
     """
@@ -179,6 +182,9 @@ def temperature_slider(value=5778):
         tooltip='Temperature of the black body.'
     )
 
+def cmb_map_iframe(height=400):
+    return IFrame(const.cmb_map_url, width='100%', height=f'{height}px')
+
 def cmb_map_objects(num_cols=3):
 
     # FIXME: Placeholder URLs for the images, replace with actual URLs or local file paths
@@ -238,12 +244,12 @@ def cmb_map_objects(num_cols=3):
 
     display(widgets.VBox(rows + [widgets.Box([check_button], layout=centered()), result_label]))
 
-def calculate_moon_distance():
+def calculate_moon_distance(moon_distance=0, light_time=0):
     expected_distance_m = (const.moon_r * 2) / const.moon_angular_size
     expected_time_for_light_s = expected_distance_m / const.c
 
-    distance_input = widgets.FloatText(description='Distance (km):')
-    time_input = widgets.FloatText(description='Time (s):')
+    distance_input = widgets.FloatText(description='Distance (km):', value=moon_distance)
+    time_input = widgets.FloatText(description='Time (s):', value=light_time)
     check_button = widgets.Button(description='Check Answers')
     result_output = widgets.Label()
 
@@ -282,6 +288,74 @@ def calculate_moon_distance():
         widgets.Box([check_button], layout=centered()),
         result_output
     ]))
+
+def coordinate_inputs(cmb_map):
+
+    output = Output()
+    container = widgets.VBox()
+    coord_widgets = []
+
+    def update_plot(change):
+        global cmb_coords
+
+        cmb_coords = []
+        for i, (lat_input, long_input) in enumerate(coord_widgets):
+            lat, long = lat_input.value, long_input.value
+            if lat != 0 or long != 0:
+                cmb_coords.append((lat_input.value, long_input.value))
+
+        thumbnails = cmb_utils.extract_thumbnails(cmb_map, cmb_coords)
+        cmb_utils.plot_thumbnails(thumbnails, figsize=(10, 6), output=output)
+
+    def add_coordinate_inputs(lat=None, long=None):
+        index_label = widgets.Label(value=f'Coordinate {len(coord_widgets) + 1}:')
+        lat_input = widgets.FloatText(value=lat, description='Lat:', step=0.0001, continuous_update=True)
+        long_input = widgets.FloatText(value=long, description='Long:', step=0.0001, continuous_update=True)
+
+        lat_input.observe(update_plot, names='value')
+        long_input.observe(update_plot, names='value')
+
+        coord_widgets.append((lat_input, long_input))
+        container.children += (widgets.HBox([index_label, lat_input, long_input]),)
+    
+    for lat, long in cmb_coords:
+        add_coordinate_inputs(lat, long)
+    
+    # Add an empty one at the end
+    add_coordinate_inputs(0, 0)
+    
+    add_button = widgets.Button(description='Add Coordinates')
+    
+    def on_add_button_clicked(b):
+        add_coordinate_inputs()
+    
+    add_button.on_click(on_add_button_clicked)
+    
+    update_plot(None)
+    display(container, add_button, output)
+
+def cmb_thumbnails_averaging(cmb_map):
+
+    slider = widgets.IntSlider(
+        value=1,
+        min=1,
+        max=len(cmb_coords),
+        step=1,
+        description='Number of thumbnails to use:',
+        readout=True,
+        continuous_update=False,
+        tooltip='Number of thumbnails to average.'
+    )
+
+    def update(amount):
+        global cmb_coords
+        thumbnails = cmb_utils.extract_thumbnails(cmb_map, cmb_coords[0:amount])
+        mean_thumbnail = np.mean(thumbnails, axis=0)
+        cmb_utils.view_map(mean_thumbnail, size=(4, 4))
+
+    set_widget_styles([slider]) 
+
+    interact(update, amount=slider)
 
 def set_widget_styles(list, description_width='initial'):
     for widget in list:
