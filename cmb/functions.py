@@ -1,9 +1,6 @@
 import numpy as np
 
-# Constants in SI units
-h = 6.62607015e-34  # Planck constant, J·s
-c = 299792458       # Speed of light, m/s
-k = 1.380649e-23    # Boltzmann constant, J/K
+from const import h, c, k
 
 def blackbody_radiation(wavelength, temp):
     """
