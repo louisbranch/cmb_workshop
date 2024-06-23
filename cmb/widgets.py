@@ -1,6 +1,8 @@
 import math
 import requests
 from io import BytesIO
+from dataclasses import dataclass
+from typing import List
 
 import numpy as np
 from ipywidgets import interact, Output, Label, VBox, HBox, widgets
@@ -8,8 +10,20 @@ from IPython.display import display, IFrame
 
 from . import plot, const, cmb_utils
 
- # Store the coordinates for the thumbnails across the notebook
-cmb_coords = const.cmb_thumbnails_coords
+@dataclass
+class CMBStoringData:
+    map: object
+    coords: List[List[float]]
+    mean_image: object
+
+    def __init__(self):
+        fits='data/COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'
+        self.map = cmb_utils.load_cmb_map(fits)
+        self.coords = const.cmb_thumbnails_coords
+        self.mean_image = None
+
+# global instance to store the data accross the widgets
+cmb_data = CMBStoringData()
 
 def peak_wavelength(bb_student_fn, wl_student_fn, wavelengths=const.wavelengths):
     """
@@ -147,7 +161,7 @@ def cobe_fit(bb_student_fn):
     update_plot()
     display(output)
 
-def cmb_std_dev(data):
+def cmb_std_dev():
 
     guidelines = widgets.Checkbox(
         value=False,
@@ -158,7 +172,9 @@ def cmb_std_dev(data):
     )
 
     def update_plot(guidelines):
-        plot.cmb_std_dev(data, guidelines)
+        map = cmb_data.map
+        if map is not None:
+            plot.cmb_std_dev(map, guidelines)
 
     interact(update_plot, guidelines=guidelines)
 
@@ -181,6 +197,9 @@ def temperature_slider(value=5778):
         readout_format='.0f',
         tooltip='Temperature of the black body.'
     )
+
+def cmb_planck_map():
+    plot.planck_map(cmb_data.map)
 
 def cmb_map_iframe(height=400):
     return IFrame(const.cmb_map_url, width='100%', height=f'{height}px')
@@ -289,22 +308,22 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
         result_output
     ]))
 
-def coordinate_inputs(cmb_map):
+def coordinate_inputs():
 
     output = Output()
     container = widgets.VBox()
     coord_widgets = []
 
     def update_plot(change):
-        global cmb_coords
-
-        cmb_coords = []
+        coords = []
         for i, (lat_input, long_input) in enumerate(coord_widgets):
             lat, long = lat_input.value, long_input.value
             if lat != 0 or long != 0:
-                cmb_coords.append((lat_input.value, long_input.value))
+                coords.append((lat_input.value, long_input.value))
+        
+        cmb_data.coords = coords
 
-        thumbnails = cmb_utils.extract_thumbnails(cmb_map, cmb_coords)
+        thumbnails = cmb_utils.extract_thumbnails(cmb_data.map, coords)
         cmb_utils.plot_thumbnails(thumbnails, figsize=(10, 6), output=output)
 
     def add_coordinate_inputs(lat=None, long=None):
@@ -318,7 +337,7 @@ def coordinate_inputs(cmb_map):
         coord_widgets.append((lat_input, long_input))
         container.children += (widgets.HBox([index_label, lat_input, long_input]),)
     
-    for lat, long in cmb_coords:
+    for lat, long in cmb_data.coords:
         add_coordinate_inputs(lat, long)
     
     # Add an empty one at the end
@@ -334,12 +353,12 @@ def coordinate_inputs(cmb_map):
     update_plot(None)
     display(container, add_button, output)
 
-def cmb_thumbnails_averaging(cmb_map):
+def cmb_thumbnails_averaging():
 
     slider = widgets.IntSlider(
         value=1,
         min=1,
-        max=len(cmb_coords),
+        max=len(cmb_data.coords),
         step=1,
         description='Number of thumbnails to use:',
         readout=True,
@@ -348,10 +367,10 @@ def cmb_thumbnails_averaging(cmb_map):
     )
 
     def update(amount):
-        global cmb_coords
-        thumbnails = cmb_utils.extract_thumbnails(cmb_map, cmb_coords[0:amount])
+        thumbnails = cmb_utils.extract_thumbnails(cmb_data.map, cmb_data.coords[0:amount])
         mean_thumbnail = np.mean(thumbnails, axis=0)
         cmb_utils.view_map(mean_thumbnail, size=(4, 4))
+        cmb_data.mean_image = mean_thumbnail
 
     set_widget_styles([slider]) 
 

@@ -23,7 +23,7 @@ def view_map(imap, size=(40, 10)):
     fig = plt.figure(figsize=size)
     ax = fig.add_subplot(111, projection=imap.wcs)
     ax.imshow(imap, origin="lower", cmap="planck")
-    ax.axis("off")
+    #ax.axis("off")
 
 def find_maxima(imap, neighborhood_size=100, n_threshold=2):
     # defines the radius in which we search for a local maximum
