@@ -9,6 +9,8 @@ PROVIDED_COLOR = 'C0'
 STUDENT_COLOR = 'C1'
 REFERENCE_COLOR = 'C2'
 
+COLOR1, COLOR2, COLOR3 = 'C3', 'C4', 'C5' 
+
 def blackbody_plot(wavelengths, ref_name, ref_temp, temp, bb_student_fn):
     ref_radiance = np.array([functions.blackbody_radiation(wavelength, ref_temp) for wavelength in wavelengths])
     # Calculate spectral radiance using the provided function
@@ -212,14 +214,19 @@ def cmb_std_dev(data, show_guidelines=False):
     plt.axvline(mean, color='blue', linestyle='--', label=f'Mean')
     
     if show_guidelines:
-        plt.axvline(mean + std, color='green', linestyle=':', label='1σ')
-        plt.axvline(mean - std, color='green', linestyle=':')
-        plt.axvline(mean + 2 * std, color='orange', linestyle=':', label='2σ')
-        plt.axvline(mean - 2 * std, color='orange', linestyle=':')
-        plt.axvline(mean + 3 * std, color='purple', linestyle=':', label='3σ')
-        plt.axvline(mean - 3 * std, color='purple', linestyle=':')
+        plt.axvline(mean + std, color=COLOR1, linestyle=':', label=r'1$\sigma$')
+        plt.axvline(mean - std, color=COLOR1, linestyle=':')
+        plt.axvspan(mean - std, mean + std, color=COLOR1, alpha=0.1, label='68.27%')
 
-    plt.xlabel('Temperature Fluctuations (K)')
+        plt.axvline(mean + 2 * std, color=COLOR2, linestyle=':', label=r'2$\sigma$')
+        plt.axvline(mean - 2 * std, color=COLOR2, linestyle=':')
+        plt.axvspan(mean - 2 * std, mean + 2 * std, color=COLOR2, alpha=0.1, label='95.45%')
+
+        plt.axvline(mean + 3 * std, color=COLOR3, linestyle=':', label=r'3$\sigma$')
+        plt.axvline(mean - 3 * std, color=COLOR3, linestyle=':')
+        plt.axvspan(mean - 3 * std, mean + 3 * std, color=COLOR3, alpha=0.1, label='99.73%')
+
+    plt.xlabel(r'Temperature Fluctuations ($\mu K$)')
     plt.ylabel('Count')
     plt.title('Temperature Fluctuations in CMB Data')
     plt.legend()

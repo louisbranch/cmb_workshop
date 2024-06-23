@@ -1,3 +1,7 @@
+import math
+import requests
+from io import BytesIO
+
 import numpy as np
 from ipywidgets import interact, Output, Label, VBox, HBox, widgets
 from IPython.display import display
@@ -174,6 +178,68 @@ def temperature_slider(value=5778):
         readout_format='.0f',
         tooltip='Temperature of the black body.'
     )
+
+def cmb_map_objects(num_cols=3):
+
+    # FIXME: Placeholder URLs for the images, replace with actual URLs or local file paths
+    image_urls = [
+        'https://placebear.com/200/200',
+        'https://placebear.com/200/200',
+        'https://placebear.com/200/200',
+        'https://placebear.com/200/200',
+        'https://placebear.com/200/200',
+        'https://placebear.com/200/200',
+    ]
+
+    def fetch_image(url):
+        response = requests.get(url)
+        return BytesIO(response.content).getvalue()
+
+    object_types = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
+    correct_answers = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
+
+    dropdowns = [widgets.Dropdown(options=object_types, description='Type:') for _ in image_urls]
+    image_widgets = [widgets.Image(value=fetch_image(image_url), format='jpg') for image_url in image_urls]
+
+    num_images = len(image_urls)
+    num_rows = math.ceil(num_images / num_cols)
+
+    # Arrange images and dropdowns in a grid
+    rows = []
+    for i in range(num_rows):
+        row_widgets = []
+        for j in range(num_cols):
+            idx = i * num_cols + j
+            if idx < num_images:
+                row_widgets.append(widgets.VBox([image_widgets[idx], dropdowns[idx]]))
+        rows.append(widgets.HBox(row_widgets))
+
+    result_label = widgets.Label()
+
+    # TODO: find a better way to style the answers
+    def check_answers(b):
+        correct_count = 0
+
+        for i, dropdown in enumerate(dropdowns):
+            if dropdown.value == correct_answers[i]:
+                dropdown.layout.border = '2px solid lightgreen'
+                correct_count += 1
+            else:
+                dropdown.layout.border = '2px solid lightcoral'
+        
+        if correct_count == num_images:
+            result_label.value = "You've mastered it! All answers are correct!"
+        else:
+            result_label.value = f"You got {correct_count} out of {num_images} correct."
+
+    centered = widgets.Layout(margin='20px 0 0 0', display='flex', justify_content='center')
+
+    check_button = widgets.Button(description='Check Answers')
+    check_button.on_click(check_answers)
+    check_button.layout = centered
+    result_label.layout = centered
+
+    display(widgets.VBox(rows + [widgets.Box([check_button], layout=centered), result_label]))
 
 def set_widget_styles(list, description_width='initial'):
     for widget in list:
