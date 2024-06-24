@@ -1,5 +1,6 @@
 import math
 import requests
+import os
 from io import BytesIO
 from dataclasses import dataclass
 from typing import List
@@ -17,7 +18,8 @@ class CMBStoringData:
     mean_image: object
 
     def __init__(self):
-        fits='data/COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'
+        dir = os.path.dirname(os.path.abspath(__file__))
+        fits=f'{dir}/../data/COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'
         self.map = cmb_utils.load_cmb_map(fits)
         self.coords = const.cmb_thumbnails_coords
         self.mean_image = None

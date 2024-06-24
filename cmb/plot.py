@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from ipywidgets import interact, Dropdown, FloatSlider, Label, VBox, HBox, Output
-from IPython.display import display, Math
+from ipywidgets import Output
+from IPython.display import display
 
 from . import functions, const, cmb_utils
 
@@ -197,7 +197,9 @@ def redshift_visualization(velocity, output):
         plt.show()
 
 def planck_map(map):
-    cmb_utils.view_map(map)
+    output = Output()
+    cmb_utils.view_map(map, output)
+    display(output)
 
 def cmb_std_dev(data, show_guidelines=False):
     
