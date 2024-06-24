@@ -355,6 +355,8 @@ def coordinate_inputs():
 
 def cmb_thumbnails_averaging():
 
+    output = Output()
+
     slider = widgets.IntSlider(
         value=1,
         min=1,
@@ -369,12 +371,13 @@ def cmb_thumbnails_averaging():
     def update(amount):
         thumbnails = cmb_utils.extract_thumbnails(cmb_data.map, cmb_data.coords[0:amount])
         mean_thumbnail = np.mean(thumbnails, axis=0)
-        cmb_utils.view_map(mean_thumbnail, size=(4, 4))
+        cmb_utils.view_map(mean_thumbnail, output, size=(4, 4))
         cmb_data.mean_image = mean_thumbnail
 
     set_widget_styles([slider]) 
 
     interact(update, amount=slider)
+    display(output)
 
 def set_widget_styles(list, description_width='initial'):
     for widget in list:
