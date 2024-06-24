@@ -196,11 +196,8 @@ def redshift_visualization(velocity, output):
 
         plt.show()
 
-def planck_map(fits='COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'):
-    map = cmb_utils.load_cmb_map(f'data/{fits}')
+def planck_map(map):
     cmb_utils.view_map(map)
-
-    return map
 
 def cmb_std_dev(data, show_guidelines=False):
     
