@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from ipywidgets import Output
 from IPython.display import display
 
@@ -202,7 +203,7 @@ def planck_map(map):
     display(output)
 
 def cmb_std_dev(data, show_guidelines=False):
-    
+
     mean = np.mean(data)
     std = np.std(data)
     
@@ -234,7 +235,76 @@ def cmb_std_dev(data, show_guidelines=False):
     # Set the x-ticks with the central tick at 0 and others around it
     max_tick = max(abs(data.min()), data.max())
     ticks = np.arange(-max_tick, max_tick, std)
-    plt.xticks(ticks)
-    plt.gca().set_xticklabels([f'{x:.5f}' for x in plt.gca().get_xticks()], rotation=45)
+    plt.xticks(ticks, labels=[f'{tick*1e6:.2f}' for tick in ticks])
 
+    plt.show()
+
+def averaged_hotspot_horizontal_profile(mean_img, threshold=0.3):
+
+    center_index = mean_img.shape[0] // 2
+    center_row = mean_img[center_index, :]
+
+    peak_value = np.max(center_row)
+
+    peak_threshold = threshold * peak_value
+    peak_indices = np.where(center_row >= peak_threshold)[0]
+    start_index = peak_indices[0]
+    end_index = peak_indices[-1]
+
+    plt.plot(center_row)
+    plt.fill_between(np.arange(start_index, end_index + 1), center_row[start_index:end_index + 1],
+                    alpha=0.3, label=f'{threshold*100:.0f}% Peak Value Threshold')
+    plt.annotate(f'{start_index:.0f}px', 
+                xy=(start_index, center_row[start_index]), 
+                xytext=(start_index-1, center_row[start_index]),
+                arrowprops=dict(facecolor='black', arrowstyle='->'))
+    plt.annotate(f'{end_index:.0f}px', 
+                xy=(end_index, center_row[end_index]), 
+                xytext=(end_index, center_row[end_index]),
+                arrowprops=dict(facecolor='black', arrowstyle='->'))
+    plt.xlabel("Pixel Index")
+    plt.ylabel("Temperature Fluctuation [µK]")
+    plt.title("Profile of Averaged Hot Spot (Horizontal Slice)")
+    yticks = plt.gca().get_yticks()
+    plt.yticks(yticks, labels=[f'{tick*1e6:.2f}' for tick in yticks])
+    plt.legend()
+    plt.show()
+
+    return start_index, end_index
+
+def averaged_hotspot_radial_profile(mean_img, threshold=0.3):
+    radius, profile = cmb_utils.extract_profile(mean_img)
+    peak_threshold = threshold * np.max(profile)
+    index_30_percent = np.where(profile <= peak_threshold)[0][0]
+    radius_30_percent = radius[index_30_percent]
+
+    plt.plot(radius, profile)
+    plt.xlabel("r [deg]")
+    plt.ylabel(r"T [$\mu$K]")
+    plt.fill_between(radius, profile, where=(radius <= radius_30_percent), alpha=0.3,
+                     label=f'{threshold*100:.0f}% Peak Value Threshold')
+    plt.annotate(f'{radius_30_percent:.4f} deg', 
+                xy=(radius_30_percent, profile[index_30_percent]), 
+                xytext=(radius_30_percent, profile[index_30_percent] + 5),
+                arrowprops=dict(facecolor='black', arrowstyle='->'))
+    plt.title("Radial Profile of Averaged Hot Spot")
+    plt.legend()
+    plt.show()
+
+def view_map_pixel(imap, size=(4,4), circle_x=None):
+    fig, ax = plt.subplots(figsize=size)
+    ax.imshow(imap, origin='lower', cmap='planck')
+    ax.set_xlabel('Pixel X')
+    ax.set_ylabel('Pixel Y')
+
+    if circle_x is not None:
+        start, end = circle_x
+        radius = abs(end - start) / 2
+        center_x = (start + end) / 2
+        center_y = imap.shape[0] // 2 
+        circle = patches.Circle((center_x, center_y), radius, edgecolor='black',
+                                linestyle='dashed', facecolor='none', linewidth=2)
+        ax.add_patch(circle)
+
+    plt.grid(False)
     plt.show()

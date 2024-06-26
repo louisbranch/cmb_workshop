@@ -326,7 +326,9 @@ def coordinate_inputs():
         cmb_data.coords = coords
 
         thumbnails = cmb_utils.extract_thumbnails(cmb_data.map, coords)
-        cmb_utils.plot_thumbnails(thumbnails, figsize=(10, 6), output=output)
+        with output:
+            output.clear_output(wait=True)
+            cmb_utils.plot_thumbnails(thumbnails, figsize=(10, 6))
 
     def add_coordinate_inputs(lat=None, long=None):
         index_label = widgets.Label(value=f'Coordinate {len(coord_widgets) + 1}:')
@@ -364,7 +366,7 @@ def cmb_thumbnails_averaging():
         min=1,
         max=len(cmb_data.coords),
         step=1,
-        description='Number of thumbnails to use:',
+        description='Number of thumbnails:',
         readout=True,
         continuous_update=False,
         tooltip='Number of thumbnails to average.'
@@ -373,13 +375,64 @@ def cmb_thumbnails_averaging():
     def update(amount):
         thumbnails = cmb_utils.extract_thumbnails(cmb_data.map, cmb_data.coords[0:amount])
         mean_thumbnail = np.mean(thumbnails, axis=0)
-        cmb_utils.view_map(mean_thumbnail, output, size=(4, 4))
+        with output:
+            output.clear_output(wait=True)
+            plot.view_map_pixel(mean_thumbnail)
         cmb_data.mean_image = mean_thumbnail
 
     set_widget_styles([slider]) 
 
     interact(update, amount=slider)
     display(output)
+
+def averaged_hotspot_horizontal_profile():
+    if cmb_data.mean_image is None:
+        return
+
+    slider = widgets.IntSlider(
+        value=5,
+        min=5,
+        max=95,
+        step=5,
+        description='Peak Threshold:',
+        readout=False,
+        tooltip='Threshold for peak detection.'
+    )
+    percent = widgets.Label(value='0%')
+
+    set_widget_styles([slider, percent])
+
+    graph = Output()
+    img = Output()
+
+    def on_change(change):
+        if change['new'] == 0:
+            percent.value = 'none'
+        else:
+            percent.value = f'{change["new"]}%'
+        update()
+
+    def update():
+        with graph:
+            graph.clear_output(wait=True)
+            threshold = slider.value / 100
+            circle = plot.averaged_hotspot_horizontal_profile(cmb_data.mean_image, threshold)
+        with img:
+            img.clear_output(wait=True)
+            plot.view_map_pixel(cmb_data.mean_image, circle_x=circle)
+
+    slider.observe(on_change, names='value')
+
+    update()
+    display(widgets.HBox([slider, percent]))
+
+    # Wrap the buttons in a VBox to center them vertically
+    vbox1 = widgets.VBox([graph], layout=widgets.Layout(justify_content='center'))
+    vbox2 = widgets.VBox([img], layout=widgets.Layout(justify_content='center'))
+
+    # Create an HBox to arrange the VBox elements horizontally
+    hbox = widgets.HBox([vbox1, vbox2], layout=widgets.Layout(align_items='center'))
+    display(hbox)
 
 def set_widget_styles(list, description_width='initial'):
     for widget in list:

@@ -1,13 +1,11 @@
 from pixell import colorize
 from pixell import enmap
 from scipy import ndimage
-from pixell import enmap, enplot
-import matplotlib as mpl
+from pixell import enmap
 import matplotlib.pyplot as plt
 import numpy as np
-from ipywidgets import Output
 
-from pixell import reproject, colorize, coordinates
+from pixell import reproject, colorize
 
 # try registering a new colormap, pass if it exists
 try:
@@ -19,14 +17,12 @@ def load_cmb_map(filename):
     imap = enmap.read_map(filename)
     return imap[0]
 
-def view_map(imap, output, size=(40, 10)):
-    with output:
-        output.clear_output(wait=True)
-        fig = plt.figure(figsize=size)
-        ax = fig.add_subplot(111, projection=imap.wcs)
-        ax.imshow(imap, origin="lower", cmap="planck")
-        ax.axis("off")
-        plt.show()
+def view_map(imap, size=(40, 10)):
+    fig = plt.figure(figsize=size)
+    ax = fig.add_subplot(111, projection=imap.wcs)
+    ax.imshow(imap, origin="lower", cmap="planck")
+    ax.axis("off")
+    plt.show()
 
 def find_maxima(imap, neighborhood_size=100, n_threshold=2):
     # defines the radius in which we search for a local maximum
@@ -53,19 +49,16 @@ def extract_thumbnails(imap, coords):
     thumbnails = reproject.thumbnails(imap, coords, r=np.deg2rad(1), apod=0)
     return thumbnails
 
-def plot_thumbnails(thumbnails, ncol=5, figsize=(10,10), output=Output()):
-    with output:
-        output.clear_output(wait=True)
-
-        fig = plt.figure(figsize=figsize)
-        nrow = int(np.ceil(len(thumbnails)/ncol))
-        for i, thumb in enumerate(thumbnails):
-            ax = fig.add_subplot(nrow, ncol, i+1, projection=thumb.wcs)
-            ax.imshow(thumb, cmap="planck")
-            ax.axis('off')
-            ax.set_title("Thumbnail {}".format(i+1), fontsize=10)
-        plt.tight_layout()
-        plt.show()
+def plot_thumbnails(thumbnails, ncol=5, figsize=(10,10)):
+    fig = plt.figure(figsize=figsize)
+    nrow = int(np.ceil(len(thumbnails)/ncol))
+    for i, thumb in enumerate(thumbnails):
+        ax = fig.add_subplot(nrow, ncol, i+1, projection=thumb.wcs)
+        ax.imshow(thumb, cmap="planck")
+        ax.axis('off')
+        ax.set_title("Thumbnail {}".format(i+1), fontsize=10)
+    plt.tight_layout()
+    plt.show()
 
 def extract_profile(mean_img):
     r = np.rad2deg(mean_img.modrmap())
