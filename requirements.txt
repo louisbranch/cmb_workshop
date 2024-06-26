@@ -6,3 +6,5 @@ jupyter_server
 matplotlib
 ipywidgets
 IPython
+pixell
+scipy
