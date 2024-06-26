@@ -1,0 +1,8 @@
+astropy
+numpy
+jupyter
+jupyterlab
+jupyter_server
+matplotlib
+ipywidgets
+IPython
