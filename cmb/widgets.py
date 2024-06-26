@@ -116,13 +116,13 @@ def cobe_fit(bb_student_fn):
         'Dry Ice': (190, 210),
         'Liquid Nitrogen': (90, 110),
         'Cryogenic Freezer': (5, 15),
-        'Superconductor Exp.': (0, 5)
+        'Superconductor': (0, 5)
     }
 
     reference_selector = widgets.SelectionSlider(
         options=list(temperature_references.keys()),
         value='Human Body',
-        description='As hot/cold as:',
+        description='Temperature Reference (from hot to cold):',
         continuous_update=False
     )
 
@@ -149,7 +149,8 @@ def cobe_fit(bb_student_fn):
 
     reference_selector.observe(update_temperature_slider, names='value')
 
-    set_widget_styles([reference_selector, temperature_slider])
+    set_widget_styles([reference_selector], width=60)
+    set_widget_styles([temperature_slider])
     display(reference_selector, temperature_slider)
 
     output = widgets.Output()
@@ -269,8 +270,8 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
     expected_distance_m = (const.moon_r * 2) / const.moon_angular_size
     expected_time_for_light_s = expected_distance_m / const.c
 
-    distance_input = widgets.FloatText(description='Distance (km):', value=moon_distance)
-    time_input = widgets.FloatText(description='Time (s):', value=light_time)
+    distance_input = widgets.FloatText(description='Distance to the Moon (km):', value=moon_distance)
+    time_input = widgets.FloatText(description='Light TravelTime (s):', value=light_time)
     check_button = widgets.Button(description='Check Answers')
     result_output = widgets.Label()
 
@@ -301,14 +302,13 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
         result_output.value = '\n'.join(messages)
 
     check_button.on_click(check_answers)
-    center([check_button, result_output])
 
-    # Display the interactive widgets
-    display(widgets.VBox([
-        widgets.HBox([distance_input, time_input]),
-        widgets.Box([check_button], layout=centered()),
+    display(
+        distance_input,
+        time_input,
+        check_button,
         result_output
-    ]))
+    )
 
 def coordinate_inputs():
 
@@ -331,9 +331,9 @@ def coordinate_inputs():
             cmb_utils.plot_thumbnails(thumbnails, figsize=(10, 6))
 
     def add_coordinate_inputs(lat=None, long=None):
-        index_label = widgets.Label(value=f'Coordinate {len(coord_widgets) + 1}:')
-        lat_input = widgets.FloatText(value=lat, description='Lat:', step=0.0001, continuous_update=True)
-        long_input = widgets.FloatText(value=long, description='Long:', step=0.0001, continuous_update=True)
+        index_label = widgets.Label(value=f'Coordinate {(len(coord_widgets) + 1):2}:'.replace(' ', '\xa0'))
+        lat_input = widgets.FloatText(value=lat, description='Lat (deg):', step=0.0001, continuous_update=True)
+        long_input = widgets.FloatText(value=long, description='Long (deg):', step=0.0001, continuous_update=True)
 
         lat_input.observe(update_plot, names='value')
         long_input.observe(update_plot, names='value')
@@ -385,20 +385,20 @@ def cmb_thumbnails_averaging():
     interact(update, amount=slider)
     display(output)
 
-def averaged_hotspot_horizontal_profile():
+def averaged_hotspot_profile(plot_fn, img_fn):
     if cmb_data.mean_image is None:
         return
 
     slider = widgets.IntSlider(
-        value=5,
-        min=5,
+        value=20,
+        min=20,
         max=95,
-        step=5,
+        step=1,
         description='Peak Threshold:',
         readout=False,
         tooltip='Threshold for peak detection.'
     )
-    percent = widgets.Label(value='0%')
+    percent = widgets.Label(value=f'{slider.value}%')
 
     set_widget_styles([slider, percent])
 
@@ -416,10 +416,10 @@ def averaged_hotspot_horizontal_profile():
         with graph:
             graph.clear_output(wait=True)
             threshold = slider.value / 100
-            circle = plot.averaged_hotspot_horizontal_profile(cmb_data.mean_image, threshold)
+            shape = plot_fn(cmb_data.mean_image, threshold)
         with img:
             img.clear_output(wait=True)
-            plot.view_map_pixel(cmb_data.mean_image, circle_x=circle)
+            img_fn(cmb_data.mean_image, shape)
 
     slider.observe(on_change, names='value')
 
@@ -434,7 +434,13 @@ def averaged_hotspot_horizontal_profile():
     hbox = widgets.HBox([vbox1, vbox2], layout=widgets.Layout(align_items='center'))
     display(hbox)
 
-def set_widget_styles(list, description_width='initial'):
+def averaged_hotspot_horizontal_profile():
+    averaged_hotspot_profile(plot.averaged_hotspot_horizontal_profile, plot.view_map_pixel)
+
+def averaged_hotspot_radial_profile():
+    averaged_hotspot_profile(plot.averaged_hotspot_radial_profile, plot.view_map_degrees)
+
+def set_widget_styles(list, description_width='initial', width=45):
     for widget in list:
         if isinstance(widget, widgets.HBox):
             for w in widget.children:
@@ -442,7 +448,7 @@ def set_widget_styles(list, description_width='initial'):
                 w.layout.width = '40%'
         else:
             widget.style.description_width = description_width
-            widget.layout.width = '45%'
+            widget.layout.width = f'{width}%'
 
 def centered():
     return widgets.Layout(margin='20px 0 0 0', display='flex', justify_content='center')

@@ -198,9 +198,7 @@ def redshift_visualization(velocity, output):
         plt.show()
 
 def planck_map(map):
-    output = Output()
-    cmb_utils.view_map(map, output)
-    display(output)
+    cmb_utils.view_map(map)
 
 def cmb_std_dev(data, show_guidelines=False):
 
@@ -275,30 +273,30 @@ def averaged_hotspot_horizontal_profile(mean_img, threshold=0.3):
 def averaged_hotspot_radial_profile(mean_img, threshold=0.3):
     radius, profile = cmb_utils.extract_profile(mean_img)
     peak_threshold = threshold * np.max(profile)
-    index_30_percent = np.where(profile <= peak_threshold)[0][0]
-    radius_30_percent = radius[index_30_percent]
+    index_threshold = np.where(profile <= peak_threshold)[0][0]
+    radius_threshold = radius[index_threshold]
 
     plt.plot(radius, profile)
     plt.xlabel("r [deg]")
     plt.ylabel(r"T [$\mu$K]")
-    plt.fill_between(radius, profile, where=(radius <= radius_30_percent), alpha=0.3,
+    plt.fill_between(radius, profile, where=(radius <= radius_threshold), alpha=0.3,
                      label=f'{threshold*100:.0f}% Peak Value Threshold')
-    plt.annotate(f'{radius_30_percent:.4f} deg', 
-                xy=(radius_30_percent, profile[index_30_percent]), 
-                xytext=(radius_30_percent, profile[index_30_percent] + 5),
+    plt.annotate(f'{radius_threshold:.4f} deg', 
+                xy=(radius_threshold, profile[index_threshold]), 
+                xytext=(radius_threshold, profile[index_threshold] + 5),
                 arrowprops=dict(facecolor='black', arrowstyle='->'))
     plt.title("Radial Profile of Averaged Hot Spot")
     plt.legend()
     plt.show()
 
-def view_map_pixel(imap, size=(4,4), circle_x=None):
+    return radius_threshold
+
+def view_map_pixel(imap, circle=None, size=(4,4)):
     fig, ax = plt.subplots(figsize=size)
     ax.imshow(imap, origin='lower', cmap='planck')
-    ax.set_xlabel('Pixel X')
-    ax.set_ylabel('Pixel Y')
 
-    if circle_x is not None:
-        start, end = circle_x
+    if circle is not None:
+        start, end = circle
         radius = abs(end - start) / 2
         center_x = (start + end) / 2
         center_y = imap.shape[0] // 2 
@@ -306,5 +304,30 @@ def view_map_pixel(imap, size=(4,4), circle_x=None):
                                 linestyle='dashed', facecolor='none', linewidth=2)
         ax.add_patch(circle)
 
+    ax.set_xlabel('Pixel X')
+    ax.set_ylabel('Pixel Y')
+    plt.grid(False)
+    plt.show()
+
+def view_map_degrees(imap, radius=None, size=(4, 4)):
+    wcs = imap.wcs
+
+    fig, ax = plt.subplots(figsize=size, subplot_kw={'projection': wcs})
+    ax.imshow(imap.data, origin='lower', cmap='planck')
+
+    if radius is not None:
+        avg_pixel_scale = np.mean([np.abs(wcs.wcs.cdelt[0]), np.abs(wcs.wcs.cdelt[1])])
+        radius_in_pixels = radius / avg_pixel_scale
+
+        center_x = imap.data.shape[1] // 2
+        center_y = imap.data.shape[0] // 2
+
+        circle = patches.Circle((center_x, center_y), radius_in_pixels, linestyle='dashed',
+                                edgecolor='black', facecolor='none', linewidth=2,
+                                transform=ax.get_transform('pixel'))
+        ax.add_patch(circle)
+
+    ax.set_xlabel('Right Ascension')
+    ax.set_ylabel('Declination')
     plt.grid(False)
     plt.show()

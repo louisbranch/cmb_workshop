@@ -62,9 +62,21 @@ cmb_cobes = np.array([
 
 cmb_map_url = 'https://phy-act1.princeton.edu/public/snaess/actpol/dr5/atlas/'
 
-cmb_thumbnails_coords = [
+cmb_thumbnails_coords = np.array([
     [-46.266, -25.65],
     [-40.525, -21.99],
-]
-
-#TODO: add more coordinates for demoinstration purposes
+    # similarly fill up more hot spots you identified below!
+    [-41.237, -20.341],
+    [-37.013, -27.877],
+    [-34.281, -30.20],
+    [-38.623, -32.821],
+    [-41.769, -33.936],
+    [-42.954, -34.283],
+    [-49.058, -34.883],
+    [-49.985, -36.242],
+    [-49.996, -38.113],
+    [-49.258, -41.430],
+    [-3.188, -42.858],
+    [-6.204, -42.142],
+    [16.714, -57.000],
+])
