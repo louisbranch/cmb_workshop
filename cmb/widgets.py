@@ -211,15 +211,15 @@ def cmb_planck_map():
 def cmb_map_iframe(height=400):
     display(IFrame(const.cmb_map_url, width='100%', height=f'{height}px'))
 
-def cmb_map_objects(num_cols=3, height=300):
+def cmb_map_objects(num_cols=3, path='media'):
 
-    # FIXME: Placeholder URLs for the images, replace with actual URLs or local file paths
+    #TODO: combine i18n and media paths
     image_paths = [
-        'media/cmb_spot_1.png',
-        'media/cmb_spot_2.png',
-        'media/cmb_spot_3.png',
-        'media/cmb_spot_4.png',
-        'media/cmb_spot_5.png',
+        f'{path}/cmb_spot_1.png',
+        f'{path}/cmb_spot_2.png',
+        f'{path}/cmb_spot_3.png',
+        f'{path}/cmb_spot_4.png',
+        f'{path}/cmb_spot_5.png',
     ]
 
     def read_image(image_path):
