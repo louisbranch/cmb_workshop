@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 from astropy.visualization import astropy_mpl_style
 
-def set_custom_layout(large: bool=False) -> None:
+def set_custom_layout(large: bool=False, figsize=(16, 8)) -> None:
     plt.style.use(astropy_mpl_style)
 
     # Global settings for plots
 
     # Set global figure size
-    plt.rcParams['figure.figsize'] = [16, 8]
+    plt.rcParams['figure.figsize'] = figsize
 
     # Set the global default figure facecolor to white
     plt.rcParams['figure.facecolor'] = 'white'
