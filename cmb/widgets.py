@@ -1,6 +1,7 @@
 import math
 import requests
 import os
+import uuid
 from io import BytesIO
 from dataclasses import dataclass
 from typing import List
@@ -316,11 +317,11 @@ def coordinate_inputs():
     container = widgets.VBox()
     coord_widgets = []
 
-    def update_plot(change):
+    def update(change=None):
         coords = []
-        for i, (lat_input, long_input) in enumerate(coord_widgets):
+        for i, (lat_input, long_input, id) in enumerate(coord_widgets):
             lat, long = lat_input.value, long_input.value
-            if lat != 0 or long != 0:
+            if lat is not None and long is not None:
                 coords.append((lat_input.value, long_input.value))
         
         cmb_data.coords = coords
@@ -330,31 +331,64 @@ def coordinate_inputs():
             output.clear_output(wait=True)
             cmb_utils.plot_thumbnails(thumbnails, figsize=(10, 6))
 
+    def on_remove_button_clicked(change):
+        for child in container.children:
+            if child.id == change.id:
+                container.children = tuple([child for child in container.children if child.id != change.id])
+                update()
+        for lat_input, long_input, id in coord_widgets:
+            if id == change.id:
+                coord_widgets.remove((lat_input, long_input, id))
+                break
+
+        update()
+
     def add_coordinate_inputs(lat=None, long=None):
-        index_label = widgets.Label(value=f'Coordinate {(len(coord_widgets) + 1):2}:'.replace(' ', '\xa0'))
-        lat_input = widgets.FloatText(value=lat, description='Lat (deg):', step=0.0001, continuous_update=True)
-        long_input = widgets.FloatText(value=long, description='Long (deg):', step=0.0001, continuous_update=True)
+        index_label = widgets.Label(
+            value=f'Coordinate {(len(coord_widgets) + 1):2}:'.replace(' ', '\xa0')
+        )
+        lat_input = widgets.FloatText(
+            value=lat,
+            description='Lat (deg):',
+            step=0.0001,
+            continuous_update=True,
+            tooltip='Latitude in degrees.'
+        )
+        long_input = widgets.FloatText(
+            value=long,
+            description='Long (deg):',
+            step=0.0001,
+            continuous_update=True,
+            tooltip='Longitude in degrees.'
+        )
 
-        lat_input.observe(update_plot, names='value')
-        long_input.observe(update_plot, names='value')
+        id = uuid.uuid4()
 
-        coord_widgets.append((lat_input, long_input))
-        container.children += (widgets.HBox([index_label, lat_input, long_input]),)
+        remove = widgets.Button(description='Remove')
+        remove.id = id
+
+        coord_widgets.append((lat_input, long_input, id))
+        box = widgets.HBox([index_label, lat_input, long_input, remove])
+        box.id = id
+
+        lat_input.observe(update, names='value')
+        long_input.observe(update, names='value')
+        remove.on_click(on_remove_button_clicked)
+
+        container.children += (box,)
     
     for lat, long in cmb_data.coords:
         add_coordinate_inputs(lat, long)
-    
-    # Add an empty one at the end
-    add_coordinate_inputs(0, 0)
     
     add_button = widgets.Button(description='Add Coordinates')
     
     def on_add_button_clicked(b):
         add_coordinate_inputs()
-    
+        update()
+
     add_button.on_click(on_add_button_clicked)
     
-    update_plot(None)
+    update()
     display(container, add_button, output)
 
 def cmb_thumbnails_averaging():
