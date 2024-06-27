@@ -55,16 +55,21 @@ def blackbody_radiation(student_fn, wavelengths=const.wavelengths):
     - student_fn: Student's implementation of the black body radiation law.
     - wavelengths: Array of wavelengths (in meters) to plot.
     """
+
+    output = Output()
     
     def update(temp, ref):
         ref_name, ref_temp = ref
-        plot.blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn)
+        with output:
+            output.clear_output(wait=True)
+            plot.blackbody_radiation(wavelengths, ref_name, ref_temp, temp, student_fn)
         
     temperature = temperature_slider()
     reference = reference_dropdown()
     set_widget_styles([temperature, reference])
     
     interact(update, temp=temperature, ref=reference)
+    display(output)
 
 def redshift():
     output = Output()
