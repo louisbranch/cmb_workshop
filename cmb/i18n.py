@@ -2,7 +2,7 @@ import os
 from IPython.display import display, Markdown
 
 class I18N:
-    def __init__(self, base_path="cmb/content", default_lang="en_CA"):
+    def __init__(self, base_path="content", default_lang="en_CA"):
         self.base_path = base_path
         self.current_lang = default_lang
 
