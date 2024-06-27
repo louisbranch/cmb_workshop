@@ -1,8 +1,6 @@
 import math
-import requests
 import os
 import uuid
-from io import BytesIO
 from dataclasses import dataclass
 from typing import List
 
@@ -213,40 +211,53 @@ def cmb_planck_map():
 def cmb_map_iframe(height=400):
     display(IFrame(const.cmb_map_url, width='100%', height=f'{height}px'))
 
-def cmb_map_objects(num_cols=3):
+def cmb_map_objects(num_cols=3, height=300):
 
     # FIXME: Placeholder URLs for the images, replace with actual URLs or local file paths
-    image_urls = [
-        'https://placebear.com/200/200',
-        'https://placebear.com/200/200',
-        'https://placebear.com/200/200',
-        'https://placebear.com/200/200',
-        'https://placebear.com/200/200',
-        'https://placebear.com/200/200',
+    image_paths = [
+        'media/cmb_spot_1.png',
+        'media/cmb_spot_2.png',
+        'media/cmb_spot_3.png',
+        'media/cmb_spot_4.png',
+        'media/cmb_spot_5.png',
     ]
 
-    def fetch_image(url):
-        response = requests.get(url)
-        return BytesIO(response.content).getvalue()
+    def read_image(image_path):
+        with open(image_path, "rb") as image_file:
+            return image_file.read()
 
     object_types = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
-    correct_answers = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
+    correct_answers = ['Galaxy Cluster', 'Galaxy', 'Galaxy Cluster', 'Star', 'Milky Way Galaxy']
 
-    dropdowns = [widgets.Dropdown(options=object_types, description='Type:') for _ in image_urls]
-    image_widgets = [widgets.Image(value=fetch_image(image_url), format='jpg') for image_url in image_urls]
+    dropdowns = [
+        widgets.Dropdown(
+            options=object_types,
+            description='Type:',
+            layout=widgets.Layout(width='auto')
+        )
+        for _ in image_paths
+    ]
+    image_widgets = [
+        widgets.Image(
+            value=read_image(image),
+            format='png',
+            width=200
+        )
+        for image in image_paths
+    ]
 
-    num_images = len(image_urls)
+    num_images = len(image_paths)
     num_rows = math.ceil(num_images / num_cols)
 
-    # Arrange images and dropdowns in a grid
-    rows = []
+    grid = widgets.GridspecLayout(num_rows, num_cols, height='auto')
+
+    #FIXME improve grid layout
     for i in range(num_rows):
-        row_widgets = []
         for j in range(num_cols):
             idx = i * num_cols + j
             if idx < num_images:
-                row_widgets.append(widgets.VBox([image_widgets[idx], dropdowns[idx]]))
-        rows.append(widgets.HBox(row_widgets))
+                box = widgets.VBox([image_widgets[idx], dropdowns[idx]])
+                grid[i, j] = box
 
     result_label = widgets.Label()
 
@@ -270,7 +281,8 @@ def cmb_map_objects(num_cols=3):
     check_button.on_click(check_answers)
     center([result_label, check_button])
 
-    display(widgets.VBox(rows + [widgets.Box([check_button], layout=centered()), result_label]))
+    display(grid)
+    display(widgets.VBox([widgets.Box([check_button], layout=centered()), result_label]))
 
 def calculate_moon_distance(moon_distance=0, light_time=0):
     expected_distance_m = (const.moon_r * 2) / const.moon_angular_size
@@ -487,7 +499,7 @@ def set_widget_styles(list, description_width='initial', width=45):
             widget.layout.width = f'{width}%'
 
 def centered():
-    return widgets.Layout(margin='20px 0 0 0', display='flex', justify_content='center')
+    return widgets.Layout(margin='10px 0 0 0', display='flex', justify_content='center')
 
 def center(list):
     for widget in list:
