@@ -3,17 +3,17 @@ import re
 from IPython.display import display, Markdown
 
 class I18N:
-    def __init__(self, base_path="content", images_url='', default_lang="en_CA"):
+    def __init__(self, base_path="content", images_url='', locale="en_CA"):
         self.base_path = base_path
         self.images_url = images_url
-        self.current_lang = default_lang
+        self.locale = locale
 
-    def set_lang(self, lang):
-        self.current_lang = lang
+    def set_locale(self, locale):
+        self.locale = locale
 
     def load_markdown(self, filename):
         """Load Markdown file for the current language setting."""
-        filepath = os.path.join(self.base_path, self.current_lang, f"{filename}.md")
+        filepath = os.path.join(self.base_path, self.locale, f"{filename}.md")
         try:
             with open(filepath, "r", encoding="utf-8") as file:
                 return file.read()
