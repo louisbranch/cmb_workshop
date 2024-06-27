@@ -4,7 +4,9 @@ To estimate the age of the universe using the CMB map, we can employ a methodolo
 
 Let's suppose that we already know the physical size (diameter) of the moon to be 3,474 km, and we can easily measure the angular size (diameter) of the moon on the sky to be 0.52 degrees. How do we estimate the distance to the moon? Recall the formula for an arc-length:
 
-![arclengh](media/arclength.png)
+<figure>
+<img src="media/arclength.png" />
+</figure>
 
 Therefore, we have
 $$\text{distance to the moon} = \frac{\text{physical diameter of the moon}}{\text{angular size subtended by the moon}}$$
