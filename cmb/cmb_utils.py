@@ -100,4 +100,4 @@ def measure_distance():
         integrand = lambda a: 1 / (a*H_a(a, H_0, cosmo.Om0, cosmo.Ode0, cosmo.Ogamma0) / 3e5)
         physical_dist = integrate.quad(integrand, a_recomb, 1)[0]
         c = 3.06e-7  # Mpc/yr
-        print("Travel time to recombination: {:2e} Gyr".format(physical_dist/c/1e9))
+        print("Travel time to recombination: {:2f} Gyr".format(physical_dist/c/1e9))

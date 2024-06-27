@@ -275,7 +275,7 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
     check_button = widgets.Button(description='Check Answers')
     result_output = widgets.Label()
 
-    set_widget_styles([distance_input, time_input])
+    set_widget_styles([distance_input, time_input], width=30)
 
     # Function to check and display the results
     def check_answers(b):
@@ -303,12 +303,7 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
 
     check_button.on_click(check_answers)
 
-    display(
-        distance_input,
-        time_input,
-        check_button,
-        result_output
-    )
+    display(widgets.VBox([distance_input, time_input, check_button, result_output]))
 
 def coordinate_inputs():
 
@@ -386,8 +381,6 @@ def cmb_thumbnails_averaging():
     display(output)
 
 def averaged_hotspot_profile(plot_fn, img_fn):
-    if cmb_data.mean_image is None:
-        return
 
     slider = widgets.IntSlider(
         value=20,
@@ -406,13 +399,17 @@ def averaged_hotspot_profile(plot_fn, img_fn):
     img = Output()
 
     def on_change(change):
-        if change['new'] == 0:
-            percent.value = 'none'
-        else:
-            percent.value = f'{change["new"]}%'
+        percent.value = f'{change["new"]}%'
         update()
 
     def update():
+        if cmb_data.mean_image is None:
+            with graph:
+                graph.clear_output(wait=True)
+                label = widgets.Label(value='No data available. Please check your average hotspot image.')
+                display(label)
+                return
+
         with graph:
             graph.clear_output(wait=True)
             threshold = slider.value / 100
