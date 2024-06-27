@@ -21,6 +21,12 @@ class I18N:
 
     def display_markdown(self, filename):
         """Display Markdown content in the Jupyter notebook."""
+        try:
+            from google.colab import output # type: ignore
+            output.no_vertical_scroll()
+        except ImportError:
+            pass
+
         md_content = self.load_markdown(filename)
         display(Markdown(md_content))
 
