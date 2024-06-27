@@ -210,7 +210,7 @@ def cmb_planck_map():
     plot.planck_map(cmb_data.map)
 
 def cmb_map_iframe(height=400):
-    return IFrame(const.cmb_map_url, width='100%', height=f'{height}px')
+    display(IFrame(const.cmb_map_url, width='100%', height=f'{height}px'))
 
 def cmb_map_objects(num_cols=3):
 
