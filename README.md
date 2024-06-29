@@ -1,42 +1,53 @@
-### Implementation Roadmap for CMB Workshop Notebook
+# Cosmic Microwave Background (CMB) Workshop
 
-#### Section 1: Blackbody Radiation
-- **Description**: Introduce the concept of black body radiation and its mathematical representation.
-- **Tasks**:
-  - **1.1 Textual and Mathematical Introduction**: Explain black body radiation, incorporating the equation in LaTeX.
-  - **1.2 Student Implementation Challenge**: Provide a template for students to code the blackbody radiation law equation, with a validation test for feedback.
-  - **1.3 Interactive Temperature Curve Widget**: Develop an interactive widget for visualizing the radiation curve across different temperatures.
+## Overview
 
-#### Section 2: Expansion of the Universe
-- **Description**: Explain how the universe's expansion is observed through redshift and its effect on CMB.
-- **Tasks**:
-  - **2.1 Redshift Explanation**: Describe the concept of redshift and its implications for an expanding universe.
-  - **2.2 Spectrum Fitting Activity**: Guide students to fit a spectrum to observed data to determine temperature, providing step-by-step instructions and interactive tools for visualization.
-  - **2.3 Calculating Redshift from Temperature**: Challenge students to calculate the CMB's redshift from its temperature, using interactive inputs and automated feedback for validation.
+This repository contains a Jupyter notebook and accompanying code designed for a high school educational workshop on the Cosmic Microwave Background (CMB). The workshop targets students in grades 11-12 and aims to provide a hands-on learning experience in astronomy and data analysis.
 
-#### Section 3: CMB Physics
-- **Description**: Dive into the physics behind the CMB, including critical concepts like recombination and baryon acoustic oscillations.
-- **Tasks**:
-  - **3.1 Explanation of Key Concepts**: Provide detailed explanations of recombination, free streaming, and baryon acoustic oscillations, using visuals to aid understanding.
-  - **3.2 Interactive Exploration**: Integrate interactive elements or simulations that allow students to visualize these concepts in action.
+## Educational Goals
 
-#### Section 4: Interactive CMB Map Analysis
-- **Description**: Engage students with real CMB data, teaching them how to analyze and interpret various features.
-- **Tasks**:
-  - **4.1 Using Interactive CMB Maps**: Implement or link to interactive CMB maps for students to explore.
-  - **4.2 Identifying CMB Features**: Guide students through identifying hot spots, cold spots, and other significant features in the CMB map.
-  - **4.3 Extracting Data from Hot Spots**: Provide tools or code snippets for students to extract data from selected hot spots and analyze their average profiles.
+- **Understanding the CMB**: Explain the Cosmic Microwave Background and its significance in cosmology.
+- **Formation of the CMB**: Describe how the CMB was formed and its connection to the Big Bang.
+- **Physics Concepts**: Introduce Planck's Law, Wien's Law, and black body radiation graphs.
+- **Astronomical Phenomena**: Explore the Doppler effect and redshift.
+- **Data Analysis**: Analyze real CMB data, identify features, and measure the angular size of hot spots.
+- **Programming Skills**: Improve Python programming skills through optional exercises and interactive tools.
+- **Cosmological Constants**: Understand the Hubble Constant ($H_0$) and its impact on the estimated age of the universe.
 
-#### Section 5: Power Spectrum Analysis
-- **Description**: Explain the concept of the power spectrum and its role in understanding the universe's structure.
-- **Tasks**:
-  - **5.1 Basics of Power Spectrum**: Introduce the power spectrum with explanations and examples from everyday objects.
-  - **5.2 Power Spectrum of Acoustic Oscillations**: Develop interactive tools or simulations for students to explore how the power spectrum changes with time, allowing parameter adjustments.
-  - **5.3 Analyzing the CMB Power Spectrum**: Provide real CMB power spectrum data for analysis, guiding students through understanding its features.
-  - **5.4 Theory Calculator for Power Spectrum**: Introduce an interactive tool or challenge where students attempt to fit the power spectrum with theoretical models to deduce cosmological parameters.
+## Repository Structure
 
-### Additional Notes for Development
-- **Coding Exercises**: Include Python coding exercises where appropriate, ensuring there's an automated way to check the correctness of student submissions.
-- **Interactivity**: Ensure each section has interactive elements, whether simulations, widgets, or data analysis tools, to engage students actively.
-- **Accessibility**: Write content in an accessible way, suitable for high school students with varying levels of familiarity with physics and coding.
-- **Feedback Mechanism**: Integrate a feedback mechanism for students to receive immediate and constructive feedback on their exercises, encouraging learning and correction of mistakes.
+- **Notebook**: The main Jupyter notebook (`notebook.ipynb`) guides students through the activities and concepts.
+- **cmb**: Custom Python module containing functions for data extraction, visualization, and analysis of CMB data.
+- **Content**: Educational content is provided in Canadian English, but can be translated into other languages as needed.
+
+## Getting Started
+
+1. **Clone the Repository**:
+
+```bash
+git clone https://github.com/louisbranch/cmb_workshop.git
+cd cmb_workshop
+```
+
+2. **Install Dependencies:**
+
+Ensure you have Python and Jupyter installed. Install necessary Python packages:
+```bash
+pip install -r requirements.txt
+```
+
+3. **Run the Notebook:**
+
+Start Jupyter Notebook and open `notebook.ipynb`:
+
+```bash
+jupyter notebook
+```
+
+## Contributing
+
+We welcome contributions to enhance the workshop. Please submit pull requests or open issues for any improvements or translations.
+
+## License
+
+This project is licensed under the MIT License.
