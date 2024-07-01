@@ -20,7 +20,7 @@ class CMBStoringData:
         dir = os.path.dirname(os.path.abspath(__file__))
         fits=f'{dir}/../data/COM_CMB_IQU-commander_1024_R2.02_dg16_car.fits'
         self.map = cmb_utils.load_cmb_map(fits)
-        self.coords = const.cmb_thumbnails_coords
+        self.coords = []
         self.mean_image = None
 
 # global instance to store the data accross the widgets
@@ -113,7 +113,7 @@ def redshift():
 
     plot.redshift_visualization(slider.value, output)
 
-def cobe_fit(bb_student_fn):
+def cobe_fit(bb_student_fn, reference='Human Body', temperature=300):
 
     temperature_references = {
         'Human Body': (290, 310),
@@ -125,16 +125,18 @@ def cobe_fit(bb_student_fn):
 
     reference_selector = widgets.SelectionSlider(
         options=list(temperature_references.keys()),
-        value='Human Body',
+        value=reference,
         description='Temperature Reference (from hot to cold):',
         continuous_update=False
     )
 
+    min, max = temperature_references[reference]
+
     temperature_slider = widgets.FloatSlider(
-        value=(290 + 310) / 2,
-        min=290,
-        max=310,
-        step=(310 - 290) / 100,
+        value=temperature,
+        min=min,
+        max=max,
+        step=(max - min) / 100,
         description='Temperature (K):',
         continuous_update=False,
         tooltip='Temperature of the CMB'
@@ -211,7 +213,7 @@ def cmb_planck_map():
 def cmb_map_iframe(height=400):
     display(IFrame(const.cmb_map_url, width='100%', height=f'{height}px'))
 
-def cmb_map_objects(num_cols=3, path='media'):
+def cmb_map_objects(num_cols=3, path='media', answers=[]):
 
     #TODO: combine i18n and media paths
     image_paths = [
@@ -222,6 +224,11 @@ def cmb_map_objects(num_cols=3, path='media'):
         f'{path}/cmb_spot_5.png',
     ]
 
+    def answer_value(idx):
+        if idx < len(answers):
+            return answers[idx]
+        return None
+
     def read_image(image_path):
         with open(image_path, "rb") as image_file:
             return image_file.read()
@@ -229,14 +236,16 @@ def cmb_map_objects(num_cols=3, path='media'):
     object_types = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
     correct_answers = ['Galaxy Cluster', 'Galaxy', 'Galaxy Cluster', 'Star', 'Milky Way Galaxy']
 
-    dropdowns = [
-        widgets.Dropdown(
+    dropdowns = []
+    for i, _ in enumerate(image_paths):
+        dropdown = widgets.Dropdown(
             options=object_types,
+            value=answer_value(i),
             description='Type:',
             layout=widgets.Layout(width='auto')
         )
-        for _ in image_paths
-    ]
+        dropdowns.append(dropdown)
+
     image_widgets = [
         widgets.Image(
             value=read_image(image),
@@ -323,7 +332,10 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
 
     display(widgets.VBox([distance_input, time_input, check_button, result_output]))
 
-def coordinate_inputs():
+def coordinate_inputs(initial_coords = const.cmb_thumbnails_coords):
+
+    if len(cmb_data.coords) == 0:
+        cmb_data.coords = initial_coords
 
     output = Output()
     container = widgets.VBox()
@@ -403,12 +415,14 @@ def coordinate_inputs():
     update()
     display(container, add_button, output)
 
-def cmb_thumbnails_averaging():
+def cmb_thumbnails_averaging(all=False):
 
     output = Output()
 
+    value = len(cmb_data.coords) if all else 1
+
     slider = widgets.IntSlider(
-        value=1,
+        value=value,
         min=1,
         max=len(cmb_data.coords),
         step=1,
@@ -431,10 +445,10 @@ def cmb_thumbnails_averaging():
     interact(update, amount=slider)
     display(output)
 
-def averaged_hotspot_profile(plot_fn, img_fn):
+def averaged_hotspot_profile(plot_fn, img_fn, value):
 
     slider = widgets.IntSlider(
-        value=20,
+        value=value,
         min=20,
         max=95,
         step=1,
@@ -482,11 +496,11 @@ def averaged_hotspot_profile(plot_fn, img_fn):
     hbox = widgets.HBox([vbox1, vbox2], layout=widgets.Layout(align_items='center'))
     display(hbox)
 
-def averaged_hotspot_horizontal_profile():
-    averaged_hotspot_profile(plot.averaged_hotspot_horizontal_profile, plot.view_map_pixel)
+def averaged_hotspot_horizontal_profile(value=20):
+    averaged_hotspot_profile(plot.averaged_hotspot_horizontal_profile, plot.view_map_pixel, value)
 
-def averaged_hotspot_radial_profile():
-    averaged_hotspot_profile(plot.averaged_hotspot_radial_profile, plot.view_map_degrees)
+def averaged_hotspot_radial_profile(value=20):
+    averaged_hotspot_profile(plot.averaged_hotspot_radial_profile, plot.view_map_degrees, value)
 
 def set_widget_styles(list, description_width='initial', width=45):
     for widget in list:

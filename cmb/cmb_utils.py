@@ -84,12 +84,12 @@ def measure_profile(x, profile):
 def H_a(a, H_0, Omega_m, Omega_lambda, Omega_r):
     return H_0 * (Omega_m * a**-3 + Omega_lambda + Omega_r * a**-4)**0.5
 
-def measure_distance():
+def measure_distance(h_0=70):
     from scipy import integrate
     from ipywidgets import interact 
     from astropy.cosmology import Planck18 as cosmo
 
-    @interact(H_0=70)
+    @interact(H_0=h_0)
     def fun(H_0):
         a_recomb = 1 / (1 + 1100)
 

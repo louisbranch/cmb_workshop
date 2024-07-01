@@ -17,6 +17,6 @@ This law reveals an important insight: as a blackbody gets hotter, its peak emis
 
 In astronomy, Wien's Law enables us to determine the surface temperature of stars by observing the colour of the light they emit. The colour of a star is directly related to its wavelength. A star emitting peak radiation at shorter wavelengths (more towards the blue end of the spectrum) is hotter than a star emitting peak radiation at longer wavelengths (more towards the red end of the spectrum). For reference, visible light wavelengths range from about 400 nm (nanometers) for violet light to 700 nm for red light, where 1 nm = $1 \times 10^{-9}$ meters.
 
-#### Optional Challenge: Implementing Wien's Law
+### Coding Challenge: Implementing Wien's Law
 
 Let’s implement Wien's Law to calculate the peak wavelength for a given temperature.
