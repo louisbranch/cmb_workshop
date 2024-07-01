@@ -80,14 +80,15 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
                  arrowprops=dict(arrowstyle='->', color=PROVIDED_COLOR))
 
     student_peak_wavelength = wl_student_fn(temp)
-    student_peak_radiance = bb_student_fn(student_peak_wavelength, temp)
-    if student_peak_wavelength is not None and student_peak_radiance is not None:
-        plt.scatter(student_peak_wavelength * 1e9, student_peak_radiance, c=STUDENT_COLOR, s=100, marker='*', zorder=6, label='Your Peak Wavelength')
-        plt.annotate(f'Your Peak at {student_peak_wavelength * 1e9:.2f} nm',
-                    xy=(student_peak_wavelength * 1e9, student_peak_radiance),
-                    xytext=(student_peak_wavelength * 1e9 * 1.3, student_peak_radiance * 0.9),
-                    textcoords='data',
-                    arrowprops=dict(arrowstyle='->', color=STUDENT_COLOR))
+    if student_peak_wavelength is not None:
+        student_peak_radiance = bb_student_fn(student_peak_wavelength, temp)
+        if student_peak_radiance is not None:
+            plt.scatter(student_peak_wavelength * 1e9, student_peak_radiance, c=STUDENT_COLOR, s=100, marker='*', zorder=6, label='Your Peak Wavelength')
+            plt.annotate(f'Your Peak at {student_peak_wavelength * 1e9:.2f} nm',
+                        xy=(student_peak_wavelength * 1e9, student_peak_radiance),
+                        xytext=(student_peak_wavelength * 1e9 * 1.3, student_peak_radiance * 0.9),
+                        textcoords='data',
+                        arrowprops=dict(arrowstyle='->', color=STUDENT_COLOR))
 
     # Define spectral regions with colors
     plt.axvspan(0, 400, color='violet', alpha=0.2, label='Ultraviolet')
@@ -100,7 +101,7 @@ def peak_wavelength(wavelengths, ref_name, ref_temp, temp, bb_student_fn, wl_stu
 def visibile_wavelengths():
     # Defining the visible light spectrum in nm and their corresponding colors
     wavelengths = [400, 450, 495, 570, 590, 620, 700]
-    colors = ['#8B00FF', '#4B0082', '#00FF00', '#FFFF00', '#FF7F00', '#FF0000']
+    colors = ['#8B00FF', '#0000FF', '#00FF00', '#FFFF00', '#FFA500', '#FF0000']
     labels = ['Violet', 'Blue', 'Green', 'Yellow', 'Orange', 'Red']
 
     # Create a figure and a single subplot

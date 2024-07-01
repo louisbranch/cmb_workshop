@@ -289,7 +289,7 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
     expected_time_for_light_s = expected_distance_m / const.c
 
     distance_input = widgets.FloatText(description='Distance to the Moon (km):', value=moon_distance)
-    time_input = widgets.FloatText(description='Light TravelTime (s):', value=light_time)
+    time_input = widgets.FloatText(description='Light Travel Time (s):', value=light_time)
     check_button = widgets.Button(description='Check Answers')
     result_output = widgets.Label()
 

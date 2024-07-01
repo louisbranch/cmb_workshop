@@ -2,7 +2,7 @@
 
 A CMB (Cosmic Microwave Background) map is a visual representation of the temperature fluctuations in the CMB radiation across the sky. These tiny variations in temperature are remnants of the early universe, providing a snapshot of the conditions shortly after the Big Bang. By studying these maps, scientists can learn about the universe's composition, structure, and evolution.
 
-The image below shows the progression of CMB maps from COBE, WMAP, and Planck missions. Each successive mission has provided more detailed and accurate maps, helping scientists gain deeper insights into the early universe.
+The image below shows the progression of CMB maps from COBE, WMAP, and Planck missions. Each successive mission has provided more detailed and accurate maps, helping scientists gain deeper insights into the early universe. The differences in CMB maps from different missions are like zooming in and getting better resolution on a camera, allowing us to see finer details and more accurate representations of the cosmic background radiation.
 
 <figure>
 <img src="media/cmb_progress.jpg" height='400' />

@@ -17,12 +17,11 @@ where:
 * $T$ is the absolute temperature of the blackbody in Kelvin (K)
 * $\lambda$ is the wavelength in meters (m).
 
-
 **Understanding Exponential Functions:**
 
 An exponential function, like $\exp(x)$, represents rapid growth where the value of the function increases exponentially as xx increases. In Planck's Law, the exponential term adjusts the amount of light emitted at different wavelengths based on temperature.
 
 
-**Optional Challenge:** Write your own implementation of Planck's Law:
+### Coding Challenge: Write your own implementation of Planck's Law:
 
 Try implementing Planck's Law in Python to see how much light is emitted at different wavelengths and temperatures.
