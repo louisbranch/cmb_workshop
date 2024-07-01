@@ -229,7 +229,7 @@ def cmb_map_objects(num_cols=3, path='media', answers=False):
             return image_file.read()
 
     object_types = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
-    correct_answers = ['Galaxy Cluster', 'Galaxy', 'Galaxy Cluster', 'Star', 'Milky Way Galaxy']
+    correct_answers = ['Galaxy Cluster', 'Hot Spot', 'Galaxy Cluster', 'Star', 'Milky Way Galaxy']
 
     def answer_value(idx):
         if idx < len(correct_answers):
@@ -242,7 +242,7 @@ def cmb_map_objects(num_cols=3, path='media', answers=False):
             options=object_types,
             value=answer_value(i),
             description='Type:',
-            layout=widgets.Layout(width='auto')
+            margin=0,
         )
         dropdowns.append(dropdown)
 
@@ -256,17 +256,11 @@ def cmb_map_objects(num_cols=3, path='media', answers=False):
     ]
 
     num_images = len(image_paths)
-    num_rows = math.ceil(num_images / num_cols)
 
-    grid = widgets.GridspecLayout(num_rows, num_cols, height='auto')
-
-    #FIXME improve grid layout
-    for i in range(num_rows):
-        for j in range(num_cols):
-            idx = i * num_cols + j
-            if idx < num_images:
-                box = widgets.VBox([image_widgets[idx], dropdowns[idx]])
-                grid[i, j] = box
+    children = []
+    for i in range(num_images):
+        box = widgets.HBox([image_widgets[i], dropdowns[i], widgets.Label('')])
+        children.append(box)
 
     result_label = widgets.Label()
 
@@ -275,11 +269,12 @@ def cmb_map_objects(num_cols=3, path='media', answers=False):
         correct_count = 0
 
         for i, dropdown in enumerate(dropdowns):
+            label = children[i].children[2]
             if dropdown.value == correct_answers[i]:
-                dropdown.layout.border = '2px solid lightgreen'
+                label.value = '\U00002713 Correct!'
                 correct_count += 1
             else:
-                dropdown.layout.border = '2px solid lightcoral'
+                label.value = '\U00002717 Incorrect!'
         
         if correct_count == num_images:
             result_label.value = "You've mastered it! All answers are correct!"
@@ -290,7 +285,7 @@ def cmb_map_objects(num_cols=3, path='media', answers=False):
     check_button.on_click(check_answers)
     center([result_label, check_button])
 
-    display(grid)
+    display(widgets.VBox(children))
     display(widgets.VBox([widgets.Box([check_button], layout=centered()), result_label]))
 
 def calculate_moon_distance(moon_distance=0, light_time=0):
