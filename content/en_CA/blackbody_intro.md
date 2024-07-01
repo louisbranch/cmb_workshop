@@ -10,11 +10,11 @@ $B(\lambda, T) = \frac{2hc^2}{\lambda^5} \frac{1}{\exp\left(\frac{hc}{\lambda kT
 
 where:
 
-* B(\lambda, T)$ is the spectral radiance, measured in $W/m^{3}$
-* $h$ is the Planck constant ($6.626 \times 10^{-34}$ J s)
-* $c$ is the speed of light in a vacuum ($3.00 \times 10^8$ m/s)
-* $k$ is the Boltzmann constant ($1.381 \times 10^{-23}$ J/K)
-* $T$ is the absolute temperature of the blackbody in Kelvin (K)
+* $B(\lambda, T)$ is the spectral radiance, measured in $W/m^{3}$,
+* $h$ is the Planck constant ($6.626 \times 10^{-34}$ J s),
+* $c$ is the speed of light in a vacuum ($3.00 \times 10^8$ m/s),
+* $k$ is the Boltzmann constant ($1.381 \times 10^{-23}$ J/K),
+* $T$ is the absolute temperature of the blackbody in Kelvin (K),
 * $\lambda$ is the wavelength in meters (m).
 
 **Understanding Exponential Functions:**
