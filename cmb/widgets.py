@@ -213,7 +213,7 @@ def cmb_planck_map():
 def cmb_map_iframe(height=400):
     display(IFrame(const.cmb_map_url, width='100%', height=f'{height}px'))
 
-def cmb_map_objects(num_cols=3, path='media', answers=[]):
+def cmb_map_objects(num_cols=3, path='media', answers=False):
 
     #TODO: combine i18n and media paths
     image_paths = [
@@ -224,17 +224,17 @@ def cmb_map_objects(num_cols=3, path='media', answers=[]):
         f'{path}/cmb_spot_5.png',
     ]
 
-    def answer_value(idx):
-        if idx < len(answers):
-            return answers[idx]
-        return None
-
     def read_image(image_path):
         with open(image_path, "rb") as image_file:
             return image_file.read()
 
     object_types = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
     correct_answers = ['Galaxy Cluster', 'Galaxy', 'Galaxy Cluster', 'Star', 'Milky Way Galaxy']
+
+    def answer_value(idx):
+        if idx < len(correct_answers):
+            return correct_answers[idx]
+        return None
 
     dropdowns = []
     for i, _ in enumerate(image_paths):
