@@ -1,6 +1,9 @@
 from typing import List, Callable, Optional
 import numpy as np
 from . import functions
+from .i18n import I18N
+
+i18n = I18N()
 
 def create_test_cases(name: str, test_cases: List,
                       original_func: Callable, student_func: Callable,
@@ -31,20 +34,20 @@ def create_test_cases(name: str, test_cases: List,
         try:
             result = student_func(*args)
             if result is None:
-                return f"{name} function not implemented. Skipping tests."
+                return i18n.gettext("test_not_implemented").format(name)
             
             if not np.isclose(result, expected, rtol=1e-5, atol=0):
                 raise ValueError
             
         except ValueError:
             if message_formatter is None:
-                msg = f"Scenario {scenario} failed. Expected result was close to {expected:.2e}, but got {result:.2e}."
+                msg = i18n.gettext("scenario_failed").format(scenario, expected, result)
             else:
                 msg = message_formatter(case, expected, result)
             messages.append(msg)
     
     if not messages:
-        return "All tests passed! Your implementation appears to be correct."
+        return i18n.gettext("all_tests_passed")
     else:
         return "\n\n".join(messages)
 
@@ -61,18 +64,25 @@ def test_blackbody_radiation(student_func):
     
     # Test cases
     test_cases = [
-        ("Visible light, approx. sun's surface temp", (500e-9, 5778)),
-        ("Microwave, approx. CMB temp", (1e-3, 2.725)),
+        (i18n.gettext("visible_light_scenario"), (500e-9, 5778)),
+        (i18n.gettext("microwave_scenario"), (1e-3, 2.725)),
     ]
 
     def formatter(case, expected, result):
         scenario, (wavelength, temp) = case
-        return(f"Scenario {scenario} failed:\nWavelength={wavelength} m and temperature={temp} K.\n" +
-                                    f"Expected result was close to {expected:.2e} W/m^2/sr/m, but got {result:.2e}.")
+        return (
+            i18n.gettext("scenario_failed_message").format(
+                scenario, wavelength, temp, expected, result
+            )
+        )
 
-    return create_test_cases('Blackbody Radiation', test_cases,
-                                    functions.blackbody_radiation, student_func, formatter)
-
+    return create_test_cases(
+        i18n.gettext("test_blackbody_radiation_name"), 
+        test_cases,
+        functions.blackbody_radiation, 
+        student_func, 
+        formatter
+    )
 
 def test_peak_wavelength(student_func):
     """
@@ -87,18 +97,25 @@ def test_peak_wavelength(student_func):
     """
     
     test_cases = [
-        ("Sun's surface temperature", (5778, )),  # The Sun's surface temp in Kelvin
-        ("Sirius Star temperature", (9940, )),    # Temperature of Sirius, a bright star
-        ("Cool red star", (3000, )),              # Approximate temp of a cool red star
-        ("Incandescent light bulb", (2400, )),    # Common temp for an old light bulb
-        ("Hot blue star", (20000, )),             # High temp typical of a hot blue star
+        (i18n.gettext("sun_surface_temp"), (5778, )),
+        (i18n.gettext("sirius_temp"), (9940, )),
+        (i18n.gettext("cool_red_star"), (3000, )),
+        (i18n.gettext("incandescent_bulb"), (2400, )),
+        (i18n.gettext("hot_blue_star"), (20000, )),
     ]
 
     def formatter(case, expected, result):
-        scenario, (temp, ) = case
-        return(f"Scenario {scenario} failed:\nTemperature={temp} K.\n" +
-            f"Expected peak wavelength was close to {expected:.2e} m, but got {result:.2e} m.")
+        scenario, (temp,) = case
+        return (
+            i18n.gettext("scenario_failed_wavelength").format(
+                scenario, temp, expected, result
+            )
+        )
 
-
-    return create_test_cases("Wien's Law", test_cases,
-                                    functions.peak_wavelength, student_func, formatter)
+    return create_test_cases(
+        i18n.gettext("test_wien_law_name"),
+        test_cases,
+        functions.peak_wavelength,
+        student_func,
+        formatter
+    )

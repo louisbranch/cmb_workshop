@@ -1,4 +1,3 @@
-import math
 import os
 import uuid
 from dataclasses import dataclass
@@ -7,6 +6,9 @@ from typing import List
 import numpy as np
 from ipywidgets import interact, Output, Label, VBox, HBox, widgets
 from IPython.display import display, IFrame
+
+from .i18n import I18N
+i18n = I18N()
 
 from . import plot, const, cmb_utils
 
@@ -78,9 +80,9 @@ def redshift():
         min=-8e7,
         max=1e8,
         step=1e6,
-        description='Velocity (m/s):',
+        description=i18n.gettext("velocity_slider_description"),
         readout=False,
-        tootltip='Velocity of the galaxy.'
+        tooltip=i18n.gettext("velocity_slider_tooltip")
     )
 
     velocity_label = Label()
@@ -113,23 +115,23 @@ def redshift():
 
     plot.redshift_visualization(slider.value, output)
 
-def cobe_fit(bb_student_fn, reference='Human Body', temperature=300):
+def cobe_fit(bb_student_fn, temperature=300):
 
     temperature_references = {
-        'Human Body': (290, 310),
-        'Dry Ice': (190, 210),
-        'Liquid Nitrogen': (90, 110),
-        'Cryogenic Freezer': (5, 15),
-        'Superconductor': (0, 5)
+        i18n.gettext("human_body"): (290, 310),
+        i18n.gettext("dry_ice"): (190, 210),
+        i18n.gettext("liquid_nitrogen"): (90, 110),
+        i18n.gettext("cryogenic_freezer"): (5, 15),
+        i18n.gettext("superconductor"): (0, 5)
     }
 
     reference_selector = widgets.SelectionSlider(
         options=list(temperature_references.keys()),
-        value=reference,
-        description='Temperature Reference (from hot to cold):',
+        description=i18n.gettext("temperature_reference_description"),
         continuous_update=False
     )
 
+    reference = reference_selector.value
     min, max = temperature_references[reference]
 
     temperature_slider = widgets.FloatSlider(
@@ -137,9 +139,9 @@ def cobe_fit(bb_student_fn, reference='Human Body', temperature=300):
         min=min,
         max=max,
         step=(max - min) / 100,
-        description='Temperature (K):',
+        description=i18n.gettext("temperature_slider_description"),
         continuous_update=False,
-        tooltip='Temperature of the CMB'
+        tooltip=i18n.gettext("temperature_slider_tooltip_cmb")
     )
 
     # Update the temperature slider range based on the selected magnitude
@@ -174,9 +176,9 @@ def cmb_std_dev():
 
     guidelines = widgets.Checkbox(
         value=False,
-        description='Show Guidelines',
+        description=i18n.gettext("show_guidelines_description"),
         disabled=False,
-        tooltip='Show guidelines for the standard deviation.',
+        tooltip=i18n.gettext("show_guidelines_tooltip"),
         indent=False
     )
 
@@ -187,13 +189,11 @@ def cmb_std_dev():
 
     interact(update_plot, guidelines=guidelines)
 
-
 def reference_dropdown():
     return widgets.Dropdown(
         options=[(name, (name, temp)) for name, temp in const.reference_objects],
-        value=("Sun", 5778),  # Default value
-        description='Reference Object:',
-        tooltip='Reference object to compare with.'
+        description=i18n.gettext("reference_object_description"),
+        tooltip=i18n.gettext("reference_object_tooltip")
     )
 
 def temperature_slider(value=5778):
@@ -202,9 +202,9 @@ def temperature_slider(value=5778):
         min=1000,
         max=10000,
         step=100,
-        description='Temperature (K):',
+        description=i18n.gettext("temperature_slider_description"),
         readout_format='.0f',
-        tooltip='Temperature of the black body.'
+        tooltip=i18n.gettext("temperature_slider_tooltip_bb")
     )
 
 def cmb_planck_map():
@@ -215,7 +215,7 @@ def cmb_map_iframe(height=400):
 
 def cmb_map_objects(path='media', answers=False):
 
-    #TODO: combine i18n and media paths
+    # TODO: Combine media paths with i18n support
     image_paths = [
         f'{path}/cmb_spot_1.png',
         f'{path}/cmb_spot_2.png',
@@ -228,24 +228,36 @@ def cmb_map_objects(path='media', answers=False):
         with open(image_path, "rb") as image_file:
             return image_file.read()
 
-    object_types = ['Hot Spot', 'Cold Spot', 'Star', 'Galaxy', 'Galaxy Cluster', 'Milky Way Galaxy']
-    correct_answers = ['Galaxy Cluster', 'Hot Spot', 'Galaxy Cluster', 'Star', 'Milky Way Galaxy']
+    # Define object types and use them for both dropdown options and correct answers
+    object_types = [
+        i18n.gettext("hot_spot"),
+        i18n.gettext("cold_spot"),
+        i18n.gettext("star"),
+        i18n.gettext("galaxy"),
+        i18n.gettext("galaxy_cluster"),
+        i18n.gettext("milky_way")
+    ]
+    # Map of original correct answers to translated object types
+    correct_answer_indices = [4, 0, 4, 2, 5]
+    correct_answers = [object_types[idx] for idx in correct_answer_indices]
 
     def answer_value(idx):
         if answers and idx < len(correct_answers):
             return correct_answers[idx]
         return None
 
-    dropdowns = []
-    for i, _ in enumerate(image_paths):
-        dropdown = widgets.Dropdown(
+    # Create dropdowns
+    dropdowns = [
+        widgets.Dropdown(
             options=object_types,
             value=answer_value(i),
-            description='Type:',
+            description=i18n.gettext("dropdown_type"),
             margin=0,
         )
-        dropdowns.append(dropdown)
+        for i, _ in enumerate(image_paths)
+    ]
 
+    # Create image widgets
     image_widgets = [
         widgets.Image(
             value=read_image(image),
@@ -257,13 +269,15 @@ def cmb_map_objects(path='media', answers=False):
 
     num_images = len(image_paths)
 
-    children = []
-    for i in range(num_images):
-        box = widgets.HBox([image_widgets[i], dropdowns[i], widgets.Label('')])
-        children.append(box)
+    # Organize widgets in HBox
+    children = [
+        widgets.HBox([image_widgets[i], dropdowns[i], widgets.Label('')])
+        for i in range(num_images)
+    ]
 
     result_label = widgets.Label()
 
+    # Check answers and update labels
     # TODO: find a better way to style the answers
     def check_answers(b):
         correct_count = 0
@@ -271,20 +285,20 @@ def cmb_map_objects(path='media', answers=False):
         for i, dropdown in enumerate(dropdowns):
             label = children[i].children[2]
             if dropdown.value == correct_answers[i]:
-                label.value = '\U00002713 Correct!'
+                label.value = '\U00002713 ' + i18n.gettext("correct")
                 correct_count += 1
             else:
-                label.value = '\U00002717 Incorrect!'
+                label.value = '\U00002717 ' + i18n.gettext("incorrect")
         
         if correct_count == num_images:
-            result_label.value = "You've mastered it! All answers are correct!"
+            result_label.value = i18n.gettext("all_correct_message")
         else:
-            result_label.value = f"You got {correct_count} out of {num_images} correct."
+            result_label.value = i18n.gettext("partial_correct_message").format(correct_count, num_images)
 
-    check_button = widgets.Button(description='Check Answers')
+    check_button = widgets.Button(description=i18n.gettext("check_answers_button"))
     check_button.on_click(check_answers)
-    center([result_label, check_button])
-
+    
+    # Display everything
     display(widgets.VBox(children))
     display(widgets.VBox([widgets.Box([check_button], layout=centered()), result_label]))
 
@@ -292,9 +306,16 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
     expected_distance_m = (const.moon_r * 2) / const.moon_angular_size
     expected_time_for_light_s = expected_distance_m / const.c
 
-    distance_input = widgets.FloatText(description='Distance to the Moon (km):', value=moon_distance)
-    time_input = widgets.FloatText(description='Light Travel Time (s):', value=light_time)
-    check_button = widgets.Button(description='Check Answers')
+    # Define translated descriptions and labels
+    distance_input = widgets.FloatText(
+        description=i18n.gettext("moon_distance_description"),
+        value=moon_distance
+    )
+    time_input = widgets.FloatText(
+        description=i18n.gettext("light_travel_time_description"),
+        value=light_time
+    )
+    check_button = widgets.Button(description=i18n.gettext("check_answers_button"))
     result_output = widgets.Label()
 
     set_widget_styles([distance_input, time_input], width=30)
@@ -307,19 +328,19 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
         distance_tolerance = 1e3
         time_tolerance = 0.05
         
-        distance_delta = abs(user_distance - expected_distance_m/1e3)
+        distance_delta = abs(user_distance - expected_distance_m / 1e3)
         time_delta = abs(user_time - expected_time_for_light_s)
 
         messages = []
 
         if distance_delta < distance_tolerance and time_delta < time_tolerance:
-            messages.append("Correct! Your calculations are within the expected range.")
+            messages.append(i18n.gettext("both_correct_message"))
         elif distance_delta < distance_tolerance and time_delta >= time_tolerance:
-            messages.append("Your distance is calculation correct!")
-            messages.append("Check your time calculation. Rembember to convert units where necessary (speed of light is given in m/s).")
+            messages.append(i18n.gettext("correct_distance_message"))
+            messages.append(i18n.gettext("check_time_message"))
         else:
-            messages.append("Check your calculations.")
-            messages.append("Remember to convert units where necessary (angular diameter needs to be in radians).")
+            messages.append(i18n.gettext("check_calculations_message"))
+            messages.append(i18n.gettext("unit_conversion_reminder"))
 
         result_output.value = '\n'.join(messages)
 
@@ -327,7 +348,7 @@ def calculate_moon_distance(moon_distance=0, light_time=0):
 
     display(widgets.VBox([distance_input, time_input, check_button, result_output]))
 
-def coordinate_inputs(initial_coords = const.cmb_thumbnails_coords):
+def coordinate_inputs(initial_coords=const.cmb_thumbnails_coords):
 
     if len(cmb_data.coords) == 0:
         cmb_data.coords = initial_coords
@@ -364,26 +385,26 @@ def coordinate_inputs(initial_coords = const.cmb_thumbnails_coords):
 
     def add_coordinate_inputs(lat=None, long=None):
         index_label = widgets.Label(
-            value=f'Coordinate {(len(coord_widgets) + 1):2}:'.replace(' ', '\xa0')
+            value=f'{i18n.gettext("coordinate_label")} {(len(coord_widgets) + 1):2}:'.replace(' ', '\xa0')
         )
         lat_input = widgets.FloatText(
             value=lat,
-            description='Lat (deg):',
+            description=i18n.gettext("latitude_description"),
             step=0.0001,
             continuous_update=True,
-            tooltip='Latitude in degrees.'
+            tooltip=i18n.gettext("latitude_tooltip")
         )
         long_input = widgets.FloatText(
             value=long,
-            description='Long (deg):',
+            description=i18n.gettext("longitude_description"),
             step=0.0001,
             continuous_update=True,
-            tooltip='Longitude in degrees.'
+            tooltip=i18n.gettext("longitude_tooltip")
         )
 
         id = uuid.uuid4()
 
-        remove = widgets.Button(description='Remove')
+        remove = widgets.Button(description=i18n.gettext("remove_button"))
         remove.id = id
 
         coord_widgets.append((lat_input, long_input, id))
@@ -399,7 +420,7 @@ def coordinate_inputs(initial_coords = const.cmb_thumbnails_coords):
     for lat, long in cmb_data.coords:
         add_coordinate_inputs(lat, long)
     
-    add_button = widgets.Button(description='Add Coordinates')
+    add_button = widgets.Button(description=i18n.gettext("add_coordinates_button"))
     
     def on_add_button_clicked(b):
         add_coordinate_inputs()
@@ -421,10 +442,10 @@ def cmb_thumbnails_averaging(all=False):
         min=1,
         max=len(cmb_data.coords),
         step=1,
-        description='Number of thumbnails:',
+        description=i18n.gettext("thumbnails_slider_description"),
         readout=True,
         continuous_update=False,
-        tooltip='Number of thumbnails to average.'
+        tooltip=i18n.gettext("thumbnails_slider_tooltip")
     )
 
     def update(amount):
@@ -447,9 +468,9 @@ def averaged_hotspot_profile(plot_fn, img_fn, value):
         min=20,
         max=95,
         step=1,
-        description='Peak Threshold:',
+        description=i18n.gettext("peak_threshold_slider_description"),
         readout=False,
-        tooltip='Threshold for peak detection.'
+        tooltip=i18n.gettext("peak_threshold_slider_tooltip")
     )
     percent = widgets.Label(value=f'{slider.value}%')
 
@@ -466,7 +487,7 @@ def averaged_hotspot_profile(plot_fn, img_fn, value):
         if cmb_data.mean_image is None:
             with graph:
                 graph.clear_output(wait=True)
-                label = widgets.Label(value='No data available. Please check your average hotspot image.')
+                label = widgets.Label(value=i18n.gettext("no_data_message"))
                 display(label)
                 return
 
