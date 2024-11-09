@@ -1,5 +1,8 @@
 import numpy as np
 
+from .i18n import I18N
+i18n = I18N()
+
 # Constants in SI units
 h = 6.62607015e-34  # Planck constant, J·s
 c = 299792458       # Speed of light, m/s
@@ -9,7 +12,11 @@ moon_angular_size = 0.00908 # Angular size of the Moon, rad
 
 wavelengths = np.linspace(100e-9, 2000e-9, 100) # 100 points from 100 nm to 2000 nm
 
-reference_objects = [("Sun", 5778), ("Sirius A", 9940), ("Red Dwarf", 3200)]
+reference_objects = [
+    (i18n.gettext("object_sun"), 5778),
+    (i18n.gettext("object_sirius_a"), 9940),
+    (i18n.gettext("object_red_dwarf"), 3200)
+]
 
 # COBE/FIRAS CMB monopole spectrum
 # frequency[cm^-1] by intensity [MJy/sr]

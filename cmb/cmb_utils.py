@@ -7,6 +7,9 @@ import numpy as np
 
 from pixell import reproject, colorize
 
+from .i18n import I18N
+i18n = I18N()
+
 # try registering a new colormap, pass if it exists
 try:
     colorize.mpl_register("planck")
@@ -51,12 +54,12 @@ def extract_thumbnails(imap, coords):
 
 def plot_thumbnails(thumbnails, ncol=5, figsize=(10,10)):
     fig = plt.figure(figsize=figsize)
-    nrow = int(np.ceil(len(thumbnails)/ncol))
+    nrow = int(np.ceil(len(thumbnails) / ncol))
     for i, thumb in enumerate(thumbnails):
-        ax = fig.add_subplot(nrow, ncol, i+1, projection=thumb.wcs)
+        ax = fig.add_subplot(nrow, ncol, i + 1, projection=thumb.wcs)
         ax.imshow(thumb, cmap="planck")
         ax.axis('off')
-        ax.set_title("Thumbnail {}".format(i+1), fontsize=10)
+        ax.set_title(i18n.gettext("thumbnail_title").format(i + 1), fontsize=10)
     plt.tight_layout()
     plt.show()
 
@@ -68,7 +71,6 @@ def extract_profile(mean_img):
     bin_centers = (bins[1:] + bins[:-1])/2
     return bin_centers, mean_profile * 1e6  # uK
 
-
 def measure_profile(x, profile):
     from ipywidgets import interact
 
@@ -76,10 +78,9 @@ def measure_profile(x, profile):
     def fun(v=100):
         plt.plot(x, profile)
         plt.axhline(v)
-        plt.ylabel("$\mu$K")
-        plt.xlabel("deg")
+        plt.ylabel(i18n.gettext("ylabel_temperature"))
+        plt.xlabel(i18n.gettext("xlabel_degrees"))
     return fun
-
 
 def H_a(a, H_0, Omega_m, Omega_lambda, Omega_r):
     return H_0 * (Omega_m * a**-3 + Omega_lambda + Omega_r * a**-4)**0.5
@@ -95,9 +96,11 @@ def measure_distance(h_0=70):
 
         integrand = lambda a: 1 / (a**2 * H_a(a, H_0, cosmo.Om0, cosmo.Ode0, cosmo.Ogamma0) / 3e5)
         comoving_dist = integrate.quad(integrand, a_recomb, 1)[0]
-        print("Distance to recombination: {:.2f} Mpc".format(comoving_dist))
+        print(i18n.gettext("distance_to_recombination").format(comoving_dist))
 
-        integrand = lambda a: 1 / (a*H_a(a, H_0, cosmo.Om0, cosmo.Ode0, cosmo.Ogamma0) / 3e5)
+        integrand = lambda a: 1 / (a * H_a(a, H_0, cosmo.Om0, cosmo.Ode0, cosmo.Ogamma0) / 3e5)
         physical_dist = integrate.quad(integrand, a_recomb, 1)[0]
         c = 3.06e-7  # Mpc/yr
-        print("Travel time to recombination: {:2f} Gyr".format(physical_dist/c/1e9))
+        print(i18n.gettext("travel_time_to_recombination").format(physical_dist / c / 1e9))
+
+    return fun
